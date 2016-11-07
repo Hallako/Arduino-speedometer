@@ -28,7 +28,6 @@ void loop()
  
  Serial.print((float)z);
  Serial.print("\t");
- Serial.print("\t");
 
  Serial.print(atan2(x,z)*57.2958);
  Serial.print("\t");
