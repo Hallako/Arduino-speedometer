@@ -21,7 +21,9 @@ float elapsed, time;
 float revs;
 float revolution;
 char sensorPrintout[6];
-String oldsensor;
+char oldsensor[6];
+String oldVal,sensorVal;
+
 
 void setup() {
 
@@ -33,11 +35,11 @@ void setup() {
 
   // write the static text to the screen
   // set the font color to white
-  TFTscreen.stroke(400, 200, 1200);
+  TFTscreen.stroke(1000, 950, 950);
   // set the font size
   TFTscreen.setTextSize(2);
   // write the text to the top left corner of the screen
-  TFTscreen.text("Nopeus:\n ", 0, 0);
+  TFTscreen.text("SIKMA ", 0, 0);
   // ste the font size very large for the loop
  // TFTscreen.setTextSize(4);
   Serial.begin(9600);
@@ -47,53 +49,49 @@ void setup() {
 
 void RPM()
 {
-  int sensorValue = digitalRead(sensorPin);
+  
   elapsed=millis()-start;
-  float revs = 60000/elapsed;
-  float kmh = ((tk*2.54*3.1459)*revs*60/100000);
   start=millis();
-   String sensorVal = String(kmh);
-   sensorVal.toCharArray(sensorPrintout, 6);
+    float revs = 60000/elapsed;
+    float kmh = ((tk*2.54*3.1459)*revs*60/100000);
+    sensorVal = String(kmh);
+
 /*  Serial.print(elapsed);
   Serial.print(" mS ");
   Serial.print(revolution);
   Serial.print("SEC ");
   Serial.print(revs);
   Serial.print("RPM ");*/  
-  /*
-  TFTscreen.setTextSize(4);
-  TFTscreen.stroke(0, 0, 0);
-  TFTscreen.text(sensorPrintout, 0, 20);
-   String sensorVal = String(kmh);
-   sensorVal.toCharArray(sensorPrintout, 6);
-   TFTscreen.stroke(255, 255, 255);
-   TFTscreen.text(sensorPrintout, 0, 20);
- Serial.print(sensorPrintout[0]);
- Serial.print(sensorPrintout[1]);
- Serial.print(sensorPrintout[2]);
- Serial.print(sensorPrintout[3]);
- Serial.print(sensorPrintout[4]);
- Serial.println(sensorPrintout[5]);*/
+
 
 }
 
 void loop() {
-  TFTscreen.setTextSize(4);
+  if(sensorVal != oldVal)
+  {
 
+    sensorVal.toCharArray(sensorPrintout, 6);
+  
+  TFTscreen.setTextSize(4);
+ TFTscreen.stroke(0, 0, 0);
+ TFTscreen.text(oldsensor, 0, 20);
  //  String sensorVal = String(kmh);
    //sensorVal.toCharArray(sensorPrintout, 6);
    TFTscreen.stroke(255, 255, 255);
    TFTscreen.text(sensorPrintout, 0, 20);
-   oldsensor = sensorPrintout;
+   
+   oldVal = String (sensorPrintout);
+   oldVal.toCharArray(oldsensor, 6);
+ 
  Serial.print(sensorPrintout[0]);
  Serial.print(sensorPrintout[1]);
  Serial.print(sensorPrintout[2]);
  Serial.print(sensorPrintout[3]);
  Serial.print(sensorPrintout[4]);
  Serial.println(sensorPrintout[5]);
- delay(250);
-  TFTscreen.stroke(0, 0, 0);
- TFTscreen.text(sensorPrintout, 0, 20);
+
+  }
+
 
   /*
   buttonState = digitalRead(buttonPin);
