@@ -1,6 +1,6 @@
 
 int sensorPin = 2;
-float start;
+float start, tk=22;
 float elapsed, time;
 float revs;
 float revolution;
@@ -17,7 +17,7 @@ void RPM()
   int sensorValue = digitalRead(sensorPin);
   float revs = 60000/elapsed;
   float revolution = elapsed/1000;
-  float kmh = ((3.1459*55.88)*revs*60/100000);
+  float kmh = ((tk*2.54*3.1459)*revs*60/100000);
   elapsed=millis()-start;
   start=millis();
 
