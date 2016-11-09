@@ -1,7 +1,6 @@
 
 int sensorPin = 2;
-int counter = 0;
-float start, finished;
+float start;
 float elapsed, time;
 float revs;
 float revolution;
@@ -23,13 +22,13 @@ void RPM()
   start=millis();
 
   Serial.print(elapsed);
-  Serial.print(" aika mS ");
+  Serial.print(" mS ");
   Serial.print(revolution);
-  Serial.print(" SEC ");
+  Serial.print("SEC ");
   Serial.print(revs);
-  Serial.print(" RPM ");
+  Serial.print("RPM ");
   Serial.print(kmh);
-  Serial.println(" kmh ");
+  Serial.println("KMH ");
 }
 
 void loop() 
