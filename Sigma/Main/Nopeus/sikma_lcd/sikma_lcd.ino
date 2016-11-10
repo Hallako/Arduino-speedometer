@@ -6,14 +6,12 @@
 #define rst  8
 
 TFT TFTscreen = TFT(cs, dc, rst);
-
+unsigned int s,m,h,seconds,secondsoff;
 const int buttonPin = 12;
-int ;
-
 int buttonState = 0, sensorPin = 2, v=1;
 float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time;
-char oldsensor[6], Matka[6], sensorPrintout[6];
-String oldVal,sensorVal,matkaVal;
+char oldsensor[6], Matka[6], sensorPrintout[6], secc[6];
+String oldVal,sensorVal,matkaVal,sec,min,hou;
 
 void setup() {
 
@@ -94,7 +92,7 @@ void loop() {
 	
   }
 	break;
-	 switch (v)
+	switch (v)
 	case 1:
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.text(Matka, 0, 60);
@@ -114,6 +112,25 @@ void loop() {
 	break;
 	
 	case 2:
+	seconds = millis()-secondsoff; 	//secondsoff = offset resetistä.
+	t = seconds;					// h= hours m=minutes s=seconds 
+    s = t % 60;
+    t = (t - s)/60;
+    m = t % 60;
+    t = (t - m)/60;
+    h = t;
+	
+	ltoa(s,sec,10);						//long = string
+	
+	TFTscreen.stroke(0, 0, 0);
+    TFTscreen.text(Matka, 0, 60);
+	
+    
+	sec.toCharArray(secc,6);
+    TFTscreen.stroke(255, 255, 255);
+    TFTscreen.text(Matka, 0, 60);
+	delay(1000);
+}
 	
   /*
   buttonState = digitalRead(buttonPin);
