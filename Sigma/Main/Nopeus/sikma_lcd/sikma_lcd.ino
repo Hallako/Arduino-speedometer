@@ -31,7 +31,7 @@ void setup() {
   // write the text to the top left corner of the screen
   TFTscreen.text("SIKMA ", 0, 0);
   // ste the font size very large for the loop
- // TFTscreen.setTextSize(4);
+  // TFTscreen.setTextSize(4);
   Serial.begin(9600);
   attachInterrupt(0, RPM, RISING);
   attachInterrupt(digitalPinToInterrupt(3), lisa, RISING);
@@ -59,19 +59,17 @@ void lisa()
 
 void loop() {
 
- switch (v)
 
-	case 1:
+
   if(sensorVal != oldVal)
   {
-	
   sensorVal.toCharArray(sensorPrintout, 6);
   
   TFTscreen.setTextSize(4);
   TFTscreen.stroke(0, 0, 0);
   TFTscreen.text(oldsensor, 0, 20);
-  TFTscreen.stroke(0, 0, 0);
-  TFTscreen.text(Matka, 0, 60);
+	//TFTscreen.stroke(0, 0, 0);
+	//TFTscreen.text(Matka, 0, 60);
 //String sensorVal = String(kmh);
 //sensorVal.toCharArray(sensorPrintout, 6);
   TFTscreen.stroke(255, 255, 255);
@@ -81,10 +79,10 @@ void loop() {
    oldVal = String (sensorPrintout);
    oldVal.toCharArray(oldsensor, 6);
 
-   matkaVal = String (matka);
+ /*  matkaVal = String (matka);
    matkaVal.toCharArray(Matka, 6);
    TFTscreen.stroke(255, 255, 255);
-   TFTscreen.text(Matka, 0, 60);
+   TFTscreen.text(Matka, 0, 60); */
  
  Serial.print(sensorPrintout[0]);
  Serial.print(sensorPrintout[1]);
@@ -92,16 +90,31 @@ void loop() {
  Serial.print(sensorPrintout[3]);
  Serial.print(sensorPrintout[4]);
  Serial.println(sensorPrintout[5]);
- Serial.print(Matka[0]);
- Serial.print(Matka[1]);
- Serial.print(Matka[2]);
- Serial.print(Matka[3]);
- Serial.println(Matka[4]);
+ 
 	
-
   }
 	break;
-
+	 switch (v)
+	case 1:
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text(Matka, 0, 60);
+	
+	matkaVal = String (matka);
+    matkaVal.toCharArray(Matka, 6);
+    TFTscreen.stroke(255, 255, 255);
+    TFTscreen.text(Matka, 0, 60);
+ 
+	
+	
+	Serial.print(Matka[0]);
+	Serial.print(Matka[1]);
+	Serial.print(Matka[2]);
+	Serial.print(Matka[3]);
+	Serial.println(Matka[4]);
+	break;
+	
+	case 2:
+	
   /*
   buttonState = digitalRead(buttonPin);
 
