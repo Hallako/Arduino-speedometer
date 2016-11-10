@@ -1,32 +1,19 @@
 #include <TFT.h>  // Arduino LCD library
 #include <SPI.h>
 
-// pin definition for the Uno
 #define cs   10
 #define dc   9
 #define rst  8
 
 TFT TFTscreen = TFT(cs, dc, rst);
 
-// variables for the position of the ball and paddle
-
-
-
 const int buttonPin = 12;
 int buttonState = 0;
 
 int sensorPin = 2;
-float start, tk=22;
-float elapsed, time;
-float revs;
-float revolution;
-char sensorPrintout[6];
-char oldsensor[6];
-String oldVal,sensorVal;
-float kierrokset = 0;
-float matka = 0;
-String matkaVal;
-char Matka[6];
+float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time;
+char oldsensor[6], Matka[6], sensorPrintout[6];
+String oldVal,sensorVal,matkaVal;
 
 void setup() {
 
@@ -60,29 +47,21 @@ void RPM()
     sensorVal = String(kmh);
   kierrokset += 1;
   matka = kierrokset * (tk*2.54*3.1459)/100000;
-/*  Serial.print(elapsed);
-  Serial.print(" mS ");
-  Serial.print(revolution);
-  Serial.print("SEC ");
-  Serial.print(revs);
-  Serial.print("RPM ");*/  
-
-
 }
 
 void loop() {
   if(sensorVal != oldVal)
   {
 
-    sensorVal.toCharArray(sensorPrintout, 6);
+  sensorVal.toCharArray(sensorPrintout, 6);
   
   TFTscreen.setTextSize(4);
- TFTscreen.stroke(0, 0, 0);
- TFTscreen.text(oldsensor, 0, 20);
   TFTscreen.stroke(0, 0, 0);
- TFTscreen.text(Matka, 0, 60);
- //  String sensorVal = String(kmh);
-   //sensorVal.toCharArray(sensorPrintout, 6);
+  TFTscreen.text(oldsensor, 0, 20);
+  TFTscreen.stroke(0, 0, 0);
+  TFTscreen.text(Matka, 0, 60);
+	//String sensorVal = String(kmh);
+    //sensorVal.toCharArray(sensorPrintout, 6);
    TFTscreen.stroke(255, 255, 255);
    TFTscreen.text(sensorPrintout, 0, 20);
    
@@ -120,7 +99,7 @@ void loop() {
   TFTscreen.text(nopeus, 0, 20);
   TFTscreen.setTextSize(4);
   TFTscreen.stroke(1024, 1000, 1024);
-  TFTscreen.text(" KM/H\n", 30, 50);*/
+  TFTscreen.text(" KM/H\n", 30, 50); */
 
 
 }
