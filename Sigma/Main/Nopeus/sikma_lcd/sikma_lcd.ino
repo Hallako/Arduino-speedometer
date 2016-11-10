@@ -34,6 +34,7 @@ void setup() {
  // TFTscreen.setTextSize(4);
   Serial.begin(9600);
   attachInterrupt(0, RPM, RISING);
+  attachInterrupt(digitalPinToInterrupt(3), lisa, RISING);
   start=millis();
 }
 
@@ -49,10 +50,21 @@ void RPM()
   matka = kierrokset * (tk*2.54*3.1459)/100000;
 }
 
+void lisa()
+{	v+=1;
+	if(v==4){
+	v=1;
+}
+}
+
 void loop() {
+
+ switch (v)
+
+	case 1:
   if(sensorVal != oldVal)
   {
-
+	
   sensorVal.toCharArray(sensorPrintout, 6);
   
   TFTscreen.setTextSize(4);
@@ -60,12 +72,12 @@ void loop() {
   TFTscreen.text(oldsensor, 0, 20);
   TFTscreen.stroke(0, 0, 0);
   TFTscreen.text(Matka, 0, 60);
-	//String sensorVal = String(kmh);
-    //sensorVal.toCharArray(sensorPrintout, 6);
-   TFTscreen.stroke(255, 255, 255);
-   TFTscreen.text(sensorPrintout, 0, 20);
+//String sensorVal = String(kmh);
+//sensorVal.toCharArray(sensorPrintout, 6);
+  TFTscreen.stroke(255, 255, 255);
+  TFTscreen.text(sensorPrintout, 0, 20);
    
-  //ottaa vanhan arvon talteen näytön tyhjennystä varten
+//ottaa vanhan arvon talteen näytön tyhjennystä varten
    oldVal = String (sensorPrintout);
    oldVal.toCharArray(oldsensor, 6);
 
@@ -85,10 +97,10 @@ void loop() {
  Serial.print(Matka[2]);
  Serial.print(Matka[3]);
  Serial.println(Matka[4]);
- 
+	
 
   }
-
+	break;
 
   /*
   buttonState = digitalRead(buttonPin);
