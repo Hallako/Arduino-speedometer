@@ -8,9 +8,9 @@
 TFT TFTscreen = TFT(cs, dc, rst);
 
 const int buttonPin = 12;
-int buttonState = 0;
+int ;
 
-int sensorPin = 2;
+int buttonState = 0, sensorPin = 2, v=1;
 float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time;
 char oldsensor[6], Matka[6], sensorPrintout[6];
 String oldVal,sensorVal,matkaVal;
