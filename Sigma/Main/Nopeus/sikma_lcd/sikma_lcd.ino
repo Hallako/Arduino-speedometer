@@ -18,18 +18,15 @@ void setup() {
   pinMode(buttonPin, INPUT);
   TFTscreen.begin();
 
-  // clear the screen with a black background
   TFTscreen.background(0,0,0);
 
-  // write the static text to the screen
-  // set the font color to white
+
   TFTscreen.stroke(1000, 950, 950);
-  // set the font size
+
   TFTscreen.setTextSize(2);
-  // write the text to the top left corner of the screen
+ 
   TFTscreen.text("SIKMA ", 0, 0);
-  // ste the font size very large for the loop
-  // TFTscreen.setTextSize(4);
+
   Serial.begin(9600);
   attachInterrupt(0, RPM, RISING);
   attachInterrupt(digitalPinToInterrupt(3), lisa, RISING);
@@ -57,8 +54,6 @@ void lisa()
 
 void loop() {
 
-
-
   if(sensorVal != oldVal)
   {
   sensorVal.toCharArray(sensorPrintout, 6);
@@ -66,21 +61,13 @@ void loop() {
   TFTscreen.setTextSize(4);
   TFTscreen.stroke(0, 0, 0);
   TFTscreen.text(oldsensor, 0, 20);
-	//TFTscreen.stroke(0, 0, 0);
-	//TFTscreen.text(Matka, 0, 60);
-//String sensorVal = String(kmh);
-//sensorVal.toCharArray(sensorPrintout, 6);
   TFTscreen.stroke(255, 255, 255);
   TFTscreen.text(sensorPrintout, 0, 20);
    
-//ottaa vanhan arvon talteen näytön tyhjennystä varten
+  //ottaa vanhan arvon talteen näytön tyhjennystä varten
    oldVal = String (sensorPrintout);
    oldVal.toCharArray(oldsensor, 6);
 
- /*  matkaVal = String (matka);
-   matkaVal.toCharArray(Matka, 6);
-   TFTscreen.stroke(255, 255, 255);
-   TFTscreen.text(Matka, 0, 60); */
  
  Serial.print(sensorPrintout[0]);
  Serial.print(sensorPrintout[1]);
@@ -112,14 +99,14 @@ void loop() {
 	
 	case 2:
 	seconds = (millis()-secondsoff)/1000; 	//secondsoff = offset resetistä.
-	t = seconds;					// h= hours m=minutes s=seconds 
+	t = seconds;							// h= hours m=minutes s=seconds 
     s = t % 60;
     t = (t - s)/60;
     m = t % 60;
     t = (t - m)/60;
     h = t;
 	
-	ltoa(s,secc,10);						//long = string
+	ltoa(s,secc,10);						//long = chart
 	
 	TFTscreen.stroke(0, 0, 0);
     TFTscreen.text(Matka, 0, 60);
@@ -130,20 +117,5 @@ void loop() {
 	delay(1000);
 	break;
 }
-	
-	
-	
-  /*
-  buttonState = digitalRead(buttonPin);
-
-  TFTscreen.setTextSize(4);
-  TFTscreen.stroke(255, 255, 255);
-
-  TFTscreen.text(nopeus, 0, 20);
-  TFTscreen.setTextSize(4);
-  TFTscreen.stroke(1024, 1000, 1024);
-  TFTscreen.text(" KM/H\n", 30, 50); */
-
-
 }
 
