@@ -9,22 +9,18 @@ TFT TFTscreen = TFT(cs, dc, rst);
 unsigned int s,m,h,t,seconds,secondsoff;
 const int buttonPin = 12;
 int buttonState = 0, sensorPin = 2, v=1;
-float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time;
-char oldsensor[6], Matka[6], sensorPrintout[6], secc[6];
-String oldVal,sensorVal,matkaVal,sec,minu,hou;
+float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time, kmh;
+char oldsensor[6], Matka[6], sensorPrintout[6], secc[6], Matkakok[6];
+String oldVal,sensorVal,matkaVal,sec,minu,hou,matkak;
 
 void setup() {
 
   pinMode(buttonPin, INPUT);
   TFTscreen.begin();
-
   TFTscreen.background(0,0,0);
-
-
   TFTscreen.stroke(1000, 950, 950);
 
   TFTscreen.setTextSize(2);
- 
   TFTscreen.text("SIKMA ", 0, 0);
 
   Serial.begin(9600);
@@ -38,9 +34,11 @@ void RPM()
   
   elapsed=millis()-start;
   start=millis();
-    float revs = 60000/elapsed;
-    float kmh = ((tk*2.54*3.1459)*revs*60/100000);
-    sensorVal = String(kmh);
+  
+  revs = 60000/elapsed;
+  kmh = ((tk*2.54*3.1459)*revs*60/100000);
+  sensorVal = String(kmh);
+  
   kierrokset += 1;
   matka = kierrokset * (tk*2.54*3.1459)/100000;
 }
@@ -50,6 +48,13 @@ void lisa()
 	if(v==4){
 	v=1;
 }
+}
+
+void reset()
+{
+	seconds=secondsoff;
+	
+	
 }
 
 void loop() {
@@ -98,7 +103,7 @@ void loop() {
 	break;
 	
 	case 2:
-	seconds = (millis()-secondsoff)/1000; 	//secondsoff = offset resetistä.
+	seconds = (millis()/1000)-secondsoff; 	//secondsoff = offset resetistä.
 	t = seconds;							// h= hours m=minutes s=seconds 
     s = t % 60;
     t = (t - s)/60;
@@ -116,6 +121,26 @@ void loop() {
     TFTscreen.text(Matka, 0, 60);
 	delay(1000);
 	break;
+	
+	case 3:
+	
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text(Matka, 0, 60);
+	
+	matkak = String (matka);
+    matkak.toCharArray(Matkakok, 6);
+    TFTscreen.stroke(255, 255, 255);
+    TFTscreen.text(Matkakok, 0, 60);
+ 
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
 }
 
