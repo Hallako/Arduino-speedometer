@@ -7,9 +7,9 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff;
-const int buttonPin = 12;
-int buttonState = 0, sensorPin = 2, v=1;
-float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time;
+const int buttonPin = 12, inputPin=3;
+int buttonState = 0, sensorPin = 2, v=1, button_delay=0,button=3,status_button=0;
+float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time,matkat;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4], minuutit[6], sekunnit[6], tunnit[6];;
 String oldVal,sensorVal,matkaVal,sec,minn,hou;
 
@@ -17,7 +17,8 @@ String oldVal,sensorVal,matkaVal,sec,minn,hou;
 
 void setup() {
 
-  pinMode(buttonPin, INPUT);
+  pinMode(sensorPin, INPUT);
+  pinMode(5, INPUT);
   TFTscreen.begin();
 
   // clear the screen with a black background
@@ -51,13 +52,17 @@ void RPM()
 }
 
 void lisa()
-{	v+=1;
-	if(v>4){
-	v=1;
+{	
+  v+=1;
+  if(v>4){
+  v=1;
   
 }
 }
-
+{
+secondsoff+=seconds;
+matkat+=matka;
+}
 void loop() {
 
 
@@ -99,8 +104,8 @@ void loop() {
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.text(Matka, 0, 60);
  TFTscreen.text(tunnit, 0, 60);
-	
-	matkaVal = String (matka);
+	matkat=matka-matkat;
+	matkaVal = String (matkat);
     matkaVal.toCharArray(Matka, 6);
     TFTscreen.stroke(255, 255, 255);
     TFTscreen.text(Matka, 0, 60);
@@ -119,7 +124,7 @@ void loop() {
 	case 2:
  Serial.println("CASE2");
  TFTscreen.setTextSize(2);
-	seconds = (millis()-secondsoff) / 1000; 	//secondsoff = offset resetistä.
+	seconds = (millis() / 1000)-secondsoff; 	//secondsoff = offset resetistä.
   	t = seconds;					// h= hours m=minutes s=seconds 
     s = t % 60;
     t = (t - s)/60;
