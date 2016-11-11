@@ -1,4 +1,6 @@
-# Rojekti
-testi
+# Sikma
 
-Koulu Projekti alustan testaus
+
+Koulu Projekti
+
+toteutetaan arduinolla sikma.
