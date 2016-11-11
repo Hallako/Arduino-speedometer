@@ -93,8 +93,6 @@ void loop() {
     TFTscreen.stroke(255, 255, 255);
     TFTscreen.text(Matka, 0, 60);
  
-	
-	
 	Serial.print(Matka[0]);
 	Serial.print(Matka[1]);
 	Serial.print(Matka[2]);
@@ -111,15 +109,15 @@ void loop() {
     t = (t - m)/60;
     h = t;
 	
-	ltoa(s,secc,10);						//long = chart
-	
 	TFTscreen.stroke(0, 0, 0);
-    TFTscreen.text(Matka, 0, 60);
+    TFTscreen.text(secc, 0, 60);
+	ultoa(s,secc,10);						//long = chart
 	
 	sec.toCharArray(secc,6);
     TFTscreen.stroke(255, 255, 255);
-    TFTscreen.text(Matka, 0, 60);
-	delay(1000);
+    TFTscreen.text(secc, 0, 60);
+	delay(1001);
+	
 	break;
 	
 	case 3:
