@@ -36,6 +36,7 @@ void setup() {
   Serial.begin(9600);
   attachInterrupt(0, RPM, RISING);
   attachInterrupt(digitalPinToInterrupt(3), lisa, RISING);
+  attachInterrupt(digitalPinToInterrupt(5), Reset, RISING);
   start=millis();
 }
 
@@ -59,6 +60,7 @@ void lisa()
   
 }
 }
+/*void Reset()
 {
 secondsoff+=seconds;
 matkat+=matka;
@@ -66,7 +68,7 @@ matkat+=matka;
 void loop() {
 
 
-
+*/
   if(sensorVal != oldVal)
   {
   sensorVal.toCharArray(sensorPrintout, 6);
