@@ -12,7 +12,7 @@ int buttonState = 0, sensorPin = 2, v=1;
 float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4];
 String oldVal,sensorVal,matkaVal,sec,minn,hou;
-char minuutit[6], sekunnit[6], tunnit[6];
+char minuutit[10], sekunnit[10], tunnit[10];
 char screenClear[10];
 
 void setup() {
