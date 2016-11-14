@@ -6,8 +6,8 @@
 #define rst  8
 
 TFT TFTscreen = TFT(cs, dc, rst);
-unsigned long t,s,m,h,seconds,secondsoff;
-int sensorPin = 5, v=1;
+unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
+int sensorPin = 5, v=1,matkaold;
 float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT;
@@ -69,6 +69,8 @@ void loop() {
   {
     reset();
   }
+  
+  seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
 
   if(sensorVal != oldVal)
   {
@@ -99,6 +101,7 @@ void loop() {
 
 	switch (v){
   
+  if(matka!=matkaold)
 	case 1:
 	TFTscreen.setTextSize(2);
 	TFTscreen.stroke(0, 0, 0);
@@ -106,6 +109,7 @@ void loop() {
   TFTscreen.text(tunnit, 0, 60);
   TFTscreen.text(MatkaT, 0, 60);
 	matkar=matka-matkaoff;
+	matkaold=matka;
 	matkaVal = String (matkar);
     matkaVal.toCharArray(Matka, 6);
     TFTscreen.stroke(255, 255, 255);
@@ -123,11 +127,14 @@ void loop() {
 	break;
 	
 	case 2:
+	
+	if(seconds!=oldseconds){
  Serial.println("CASE2");
  TFTscreen.setTextSize(2);
  Serial.print(secondsoff);
  
-	seconds = (millis() / 1000)-secondsoff; 	//secondsoff = offset resetistä.
+	
+	oldseconds=seconds;
   	t = seconds;					// h= hours m=minutes s=seconds 
     s = t % 60;
     t = (t - s)/60;
@@ -158,10 +165,7 @@ void loop() {
   
     TFTscreen.stroke(255, 255, 255);
     TFTscreen.text(tunnit, 0, 60);
-
-	delay(1000);
-	
-	
+	}
 	break;
 	
 	case 3:
