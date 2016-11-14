@@ -7,7 +7,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,matkaold;
+int sensorPin = 5, v=1,matkaold,del=0;
 float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT;
@@ -33,7 +33,7 @@ void setup() {
   // TFTscreen.setTextSize(4);
   Serial.begin(9600);
   attachInterrupt(0, RPM, RISING);
-  attachInterrupt(digitalPinToInterrupt(3), lisa, RISING);
+ // attachInterrupt(digitalPinToInterrupt(3), lisa, RISING);
 
   start=millis();
 }
@@ -49,13 +49,11 @@ void RPM()
   kierrokset += 1;
   matka = kierrokset * (tk*2.54*3.1459)/100000;
 }
-
+/*
 void lisa()
-{	v+=1;
-	if(v>4){
-	v=1;
+{	
 }
-}
+*/
 
 void reset()
 {
@@ -64,13 +62,27 @@ void reset()
 }
  
 void loop() {
+	
+	
   int abc = digitalRead(5);
-  if(abc == HIGH)
+  del=0;
+  while(abc == HIGH)
   {
-    reset();
+    del=del+1;
+	delay(100);
+	abc = digitalRead(5);
   }
-  
-  seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
+  if(del<5){
+	  v+=1;
+	if(v>4){
+	v=1;
+  }
+  else if(del>5){
+	secondsoff = millis() / 1000;
+	matkaoff = matka;
+  }
+ 
+ seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
 
   if(sensorVal != oldVal)
   {
@@ -193,7 +205,7 @@ void loop() {
 	delay(1000);
 	break;
 }
+  }
 }
-
 
 
