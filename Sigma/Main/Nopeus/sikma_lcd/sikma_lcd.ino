@@ -145,7 +145,7 @@ void loop() {
     TFTscreen.setTextSize(2);
     TFTscreen.text(Matka, 0, 60);
     matkaold=matkar;
-
+  }
     if(mph == 1)
     {
       TFTscreen.setTextSize(1);
@@ -163,7 +163,7 @@ void loop() {
 	Serial.print(Matka[3]);
 	Serial.println(Matka[4]);*/
  Serial.println("CASE1");
- }
+ 
 	break;
  
 	case 2:
@@ -212,31 +212,34 @@ TFTscreen.setTextSize(1);
 	break;
 	
 	case 3:
-  TFTscreen.setTextSize(1);
-  TFTscreen.text("TOTAL", 60, 65);
-	TFTscreen.setTextSize(2);
-	TFTscreen.stroke(0, 0, 0);
-	TFTscreen.text(Matka, 0, 60);
+
+  if(roundf(matkat * 100) != roundf(matka * 100))
+  {
+  TFTscreen.setTextSize(2);
+  TFTscreen.stroke(0, 0, 0);
+  TFTscreen.text(Matka, 0, 60);
  TFTscreen.text(tunnit, 0, 60);
  TFTscreen.text(MatkaT, 0, 60);
  
-	matkat=matka;
-	matkaT = String (matkat);
+  matkat=matka;
+  matkaT = String (matkat);
     matkaT.toCharArray(MatkaT, 6);
     TFTscreen.stroke(255, 255, 255);
     TFTscreen.text(MatkaT, 0, 60);
-   
-	
-	
-	Serial.print(MatkaT[0]);
-	Serial.print(MatkaT[1]);
-	Serial.print(MatkaT[2]);
-	Serial.print(MatkaT[3]);
-	Serial.println(MatkaT[4]);
-	Serial.println("CASE3");
+  }
+  
+     TFTscreen.setTextSize(1);
+  TFTscreen.text("TOTAL", 60, 65);
+  
+  
+  Serial.print(MatkaT[0]);
+  Serial.print(MatkaT[1]);
+  Serial.print(MatkaT[2]);
+  Serial.print(MatkaT[3]);
+  Serial.println(MatkaT[4]);
+  Serial.println("CASE3");
  
-	delay(1000);
-	break;
+  break;
 }
   }
   void tftSetup()
