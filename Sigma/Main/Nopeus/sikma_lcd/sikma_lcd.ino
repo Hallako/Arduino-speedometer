@@ -7,10 +7,10 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph = 1;
-float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff,matkaold;
-char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6];
-String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT;
+int sensorPin = 5, v=1,del=0,mph = 0;
+float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0;
+char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0};
+String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu;
 char minuutit[10], sekunnit[10], tunnit[10];
 char screenClear[10];
 
@@ -31,7 +31,7 @@ void RPM()
   elapsed=millis()-start;
   start=millis();
     float revs = 60000/elapsed;
-    float kmh = ((tk*2.54*3.1459)*revs*60/100000);
+     kmh = ((tk*2.54*3.1459)*revs*60/100000);
     
   kierrokset += 1;
   matka = kierrokset * (tk*2.54*3.1459)/100000;
@@ -54,7 +54,8 @@ void reset()
 	matkaoff = matka;
 }
  
-void loop() {
+void loop() 
+{
 	
 	
   matkar=matka-matkaoff;
@@ -115,6 +116,20 @@ void loop() {
   TFTscreen.text("KM/h", 130, 41);
  }
   }
+  
+    if(huippu < kmh && huippu <1000)
+  {
+    TFTscreen.setTextSize(1);
+    TFTscreen.stroke(0, 0, 0);
+    TFTscreen.text(Huippu, 130, 0); 
+    huippu = kmh;
+    hUippu = String (huippu);
+    hUippu.toCharArray(Huippu, 6);
+                                             //ultoa(huippu,Huippu,10);    
+    TFTscreen.stroke(1000, 1000, 1000);
+   // TFTscreen.text(Huippu, 130, 0); 
+  TFTscreen.text(Huippu, 130, 0);
+  } 
 
 	switch (v){
   
