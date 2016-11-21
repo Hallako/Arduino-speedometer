@@ -85,11 +85,11 @@ void reset()
 void loop() 
 {
   if(fi==1){
-  delay(25);
+  delay(40);
   fi=0;
   
-  digitalWrite(5,HIGH);
-  delay(25);
+  digitalWrite(12,HIGH);
+  delay(40);
   ACSR = (1 << ACI);
   ACSR = (1 << ACIE);
   }
