@@ -6,24 +6,20 @@
 #define rst  8
 
 TFT TFTscreen = TFT(cs, dc, rst);
-unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph = 0,fi;
-float start, tk=22, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0;
+int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22;
+float start, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0};
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu;
 char minuutit[10], sekunnit[10], tunnit[10];
-char screenClear[10];
 
 void setup() {
 
   TFTscreen.begin();
   tftSetup();
   Serial.begin(9600);
-  pinMode(12,OUTPUT);
-  digitalWrite(12,HIGH);
   ADCSRB = 0;
-  ACSR =
-   (0 << ACD) |
+  ACSR =						//Analog comparaattorin alustus
+   (0 << ACD) |				
    (0 << ACBG) |   
    (0 << ACO) |    
    (1 << ACI) |    
@@ -32,31 +28,10 @@ void setup() {
    (1 << ACIS1) | 
    (1 << ACIS0);   
 
-  
   start=millis();
 }
-/*
-void RPM()
-{
-  
-  elapsed=millis()-start;
-  start=millis();
-    float revs = 60000/elapsed;
-     kmh = ((tk*2.54*3.1459)*revs*60/100000);
-    
-  kierrokset += 1;
-  matka = kierrokset * (tk*2.54*3.1459)/100000;
-  if(mph==1)
-  {
-    kmh = kmh * 0.621371;
-    matka = matka * 0.621371;
-  }
-  sensorVal = String(kmh);
-}
-*/
 
 ISR(ANALOG_COMP_vect) {
-  digitalWrite(12,LOW);
   fi=1;
    elapsed=millis()-start;
   start=millis();
@@ -87,12 +62,11 @@ void loop()
   if(fi==1){
   delay(40);
   fi=0;
-  
-  digitalWrite(12,HIGH);
   delay(40);
   ACSR = (1 << ACI);
   ACSR = (1 << ACIE);
   }
+  
   matkar=matka-matkaoff;
   del=0;
   int f = 0;
@@ -160,9 +134,7 @@ void loop()
     huippu = kmh;
     hUippu = String (huippu);
     hUippu.toCharArray(Huippu, 6);
-                                             //ultoa(huippu,Huippu,10);    
     TFTscreen.stroke(1000, 1000, 1000);
-   // TFTscreen.text(Huippu, 130, 0); 
   TFTscreen.text(Huippu, 130, 0);
   } 
 
@@ -290,11 +262,18 @@ TFTscreen.setTextSize(1);
   Serial.println("CASE3");
  
   break;
+  
+  case 4:
+  
+  
+  
+  
+  break;
 }
   }
   void tftSetup()
   {
-    // clear the screen with a black background
+  // clear the screen with a black background
   TFTscreen.background(0,0,0);
   TFTscreen.stroke(1000, 200, 200);
   // set the font size
