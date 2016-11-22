@@ -1,19 +1,19 @@
 #include <TFT.h>  // Arduino LCD library
 #include <SPI.h>
-
+#include <EEPROM.h>
 #define cs   10
 #define dc   9
 #define rst  8
 
 TFT TFTscreen = TFT(cs, dc, rst);
-int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22;
-float start, kierrokset = 0, matka = 0, revs, elapsed, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0;
+unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
+int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,f,kierrokset = 0,ekierrokset;
+float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0};
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu;
 char minuutit[10], sekunnit[10], tunnit[10];
 
 void setup() {
-
   TFTscreen.begin();
   tftSetup();
   Serial.begin(9600);
@@ -27,26 +27,29 @@ void setup() {
    (0 << ACIC) |   
    (1 << ACIS1) | 
    (1 << ACIS0);   
-
   start=millis();
+  ekierrokset = sizeof(int);
+  EEPROM.get(100, ekierrokset);
+  ematka = ekierrokset * (tk*2.54*3.1459)/100000;
+  matkat=ematka;
 }
 
 ISR(ANALOG_COMP_vect) {
   fi=1;
-   elapsed=millis()-start;
+  elapsed=millis()-start;
   start=millis();
     float revs = 60000/elapsed;
-     kmh = ((tk*2.54*3.1459)*revs*60/100000);
-    
+    kmh = ((tk*2.54*3.1459)*revs*60/100000);
   kierrokset += 1;
+  ekierrokset += 1;
   matka = kierrokset * (tk*2.54*3.1459)/100000;
-  if(mph==1)
+  ematka = ekierrokset * (tk*2.54*3.1459)/100000;
+ if(mph==1)
   {
     kmh = kmh * 0.621371;
     matka = matka * 0.621371;
   }
   sensorVal = String(kmh);
-  
   ACSR=(0 << ACIE);
 }
 
@@ -69,7 +72,7 @@ void loop()
   
   matkar=matka-matkaoff;
   del=0;
-  int f = 0;
+  f = 0;
   while(digitalRead(5) == HIGH)
   {
     del=del+1;
@@ -126,7 +129,7 @@ void loop()
  }
   }
   
-    if(huippu < kmh && huippu <1000)
+  if(huippu < kmh && huippu <1000)
   {
     TFTscreen.setTextSize(1);
     TFTscreen.stroke(0, 0, 0);
@@ -137,13 +140,15 @@ void loop()
     TFTscreen.stroke(1000, 1000, 1000);
   TFTscreen.text(Huippu, 130, 0);
   } 
-
+  if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){
+	EEPROM.put(100, ekierrokset);
+	Serial.print("eeprom.write");
+  matkat=ematka;
+  }
 	switch (v){
-  
-  
 	case 1:
- if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)
- {
+  if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)
+  {
   Serial.print(matkar);
   Serial.print("\t");
   Serial.print(matkaold);
@@ -235,24 +240,22 @@ TFTscreen.setTextSize(1);
 	
 	case 3:
 
-  if(roundf(matkat * 100) != roundf(matka * 100))
+  if(roundf(matkav * 100) != roundf(ematka * 100))
   {
   TFTscreen.setTextSize(2);
   TFTscreen.stroke(0, 0, 0);
   TFTscreen.text(Matka, 0, 60);
- TFTscreen.text(tunnit, 0, 60);
- TFTscreen.text(MatkaT, 0, 60);
+  TFTscreen.text(tunnit, 0, 60);
+  TFTscreen.text(MatkaT, 0, 60);
  
-  matkat=matka;
-  matkaT = String (matkat);
-    matkaT.toCharArray(MatkaT, 6);
-    TFTscreen.stroke(255, 255, 255);
-    TFTscreen.text(MatkaT, 0, 60);
+  matkav = ematka;
+  matkaT = String (ematka);
+  matkaT.toCharArray(MatkaT, 6);
+  TFTscreen.stroke(255, 255, 255);
+  TFTscreen.text(MatkaT, 0, 60);
   }
-  
-     TFTscreen.setTextSize(1);
+  TFTscreen.setTextSize(1);
   TFTscreen.text("TOTAL", 60, 65);
-  
   
   Serial.print(MatkaT[0]);
   Serial.print(MatkaT[1]);
@@ -260,7 +263,6 @@ TFTscreen.setTextSize(1);
   Serial.print(MatkaT[3]);
   Serial.println(MatkaT[4]);
   Serial.println("CASE3");
- 
   break;
   
   case 4:
@@ -270,7 +272,8 @@ TFTscreen.setTextSize(1);
   
   break;
 }
-  }
+
+}
   void tftSetup()
   {
   // clear the screen with a black background
