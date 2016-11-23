@@ -34,7 +34,7 @@ void setup() {
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
-  MsTimer2::set(2000, nollaus); 
+  MsTimer2::set(3000, nollaus); 
   MsTimer2::start();
 }
 
@@ -96,6 +96,7 @@ void loop()
 	  v+=1;
 	if(v>4){
 	v=1;
+	
   }
   }
   if(del>500 && f==1){
@@ -103,7 +104,18 @@ void loop()
 	matkaoff = matka;
 	huippu=0;
   }
+  if(del>5000 && f==1){
+	for(;;){
+	while(digitalRead(5) == HIGH)
+    {
  
+    }
+    if(del<500 && f==1){
+	
+		
+	}
+  }
+  }
   seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
  
   if(sensorVal != oldVal)
@@ -161,6 +173,8 @@ void loop()
   }
 	switch (v){
 	case 1:
+	
+	
   if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)
   {
   Serial.print(matkar);
@@ -247,7 +261,7 @@ TFTscreen.setTextSize(1);
 	break;
 	
 	case 3:
-
+  
   if(roundf(matkav * 100) != roundf(ematka * 100))
   {
   TFTscreen.setTextSize(2);
