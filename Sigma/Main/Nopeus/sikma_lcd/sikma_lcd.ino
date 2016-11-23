@@ -1,6 +1,8 @@
 #include <TFT.h>  // Arduino LCD library
 #include <SPI.h>
 #include <EEPROM.h>
+#include <MsTimer2.h>
+
 #define cs   10
 #define dc   9
 #define rst  8
@@ -8,7 +10,7 @@
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
 int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,f,kierrokset = 0,ekierrokset;
-float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav;
+float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0};
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu;
 char minuutit[10], sekunnit[10], tunnit[10];
@@ -32,6 +34,8 @@ void setup() {
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
+  MsTimer2::set(2000, nollaus); 
+  MsTimer2::start();
 }
 
 ISR(ANALOG_COMP_vect) {
@@ -59,7 +63,15 @@ void reset()
 	secondsoff = millis() / 1000;
 	matkaoff = matka;
 }
- 
+
+void nollaus()
+{
+	vert1=kmh;
+	if(vert1==vert2){
+	kmh=0;	
+	}
+	vert2=kmh;
+} 
 void loop() 
 {
   if(fi==1){
@@ -88,10 +100,11 @@ void loop()
   if(del>500 && f==1){
 	secondsoff = millis() / 1000;
 	matkaoff = matka;
+	huippu=0;
   }
  
   seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
-
+ 
   if(sensorVal != oldVal)
   {
   sensorVal.toCharArray(sensorPrintout, 6);
@@ -140,10 +153,10 @@ void loop()
     TFTscreen.stroke(1000, 1000, 1000);
   TFTscreen.text(Huippu, 130, 0);
   } 
-  if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){
+  if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ //tallennetaan arvo eepromiin 200m välein
 	EEPROM.put(100, ekierrokset);
 	Serial.print("eeprom.write");
-  matkat=ematka;
+	matkat=ematka;
   }
 	switch (v){
 	case 1:
@@ -183,12 +196,6 @@ void loop()
       TFTscreen.setTextSize(1);
       TFTscreen.text("km TRIP", 60, 65);
     }
-	/*
-	Serial.print(Matka[0]);
-	Serial.print(Matka[1]);
-	Serial.print(Matka[2]);
-	Serial.print(Matka[3]);
-	Serial.println(Matka[4]);*/
  Serial.println("CASE1");
  
 	break;
@@ -256,12 +263,6 @@ TFTscreen.setTextSize(1);
   }
   TFTscreen.setTextSize(1);
   TFTscreen.text("TOTAL", 60, 65);
-  
-  Serial.print(MatkaT[0]);
-  Serial.print(MatkaT[1]);
-  Serial.print(MatkaT[2]);
-  Serial.print(MatkaT[3]);
-  Serial.println(MatkaT[4]);
   Serial.println("CASE3");
   break;
   
