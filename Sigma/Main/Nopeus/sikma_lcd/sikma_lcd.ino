@@ -9,7 +9,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,otk,f,kierrokset = 0,ekierrokset,ca,screenFlag=0;
+int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,otk,f,kierrokset = 0,ekierrokset,ca,screenFlag=0,ex=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
@@ -108,7 +108,7 @@ void loop()
 	huippu=0;
   }
   if(del>5000 && f==1){
-	for(;;){
+	for(;ex!=1;){
 	del=0;
 	f=0;
 		while(digitalRead(5) == HIGH)
@@ -116,12 +116,14 @@ void loop()
 		f=1;
 		delay(1);
 		}
+		
 		if(del<500 && f==1){
 		ca+=1;
 		if(ca==4){
 		ca=1;
 		}
 		}
+		
 		if(del>500 && f==1){
 			switch(ca){
 				case 1:
@@ -144,7 +146,7 @@ void loop()
 				tk = sizeof(int);
 				EEPROM.put(110, mph);
 				EEPROM.put(120, tk);
-				return 1;
+				ex=1;
 				}
 				}
 				if(mph==1){
@@ -164,7 +166,6 @@ void loop()
 				TFTscreen.stroke(1000, 1000, 1000);
 				TFTscreen.text("KM/h", 10, 100);	
 				}
-				
 				Sotk = String (otk);
 				Sotk.toCharArray(sotk, 5);
 				TFTscreen.stroke(0, 0, 0);
@@ -174,15 +175,6 @@ void loop()
 				Stk.toCharArray(stk, 5);
 				TFTscreen.stroke(255, 255, 255);
 				TFTscreen.text(stk, 60, 100);
-				
-				
-				
-				
-				
-				
-				
-				
-				
 		}
   }
   
