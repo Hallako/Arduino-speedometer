@@ -69,6 +69,7 @@ void nollaus()
 	vert1=kmh;
 	if(vert1==vert2){
 	kmh=0;	
+	sensorVal = String(kmh);
 	}
 	vert2=kmh;
 } 
@@ -151,7 +152,7 @@ void loop()
     hUippu = String (huippu);
     hUippu.toCharArray(Huippu, 6);
     TFTscreen.stroke(1000, 1000, 1000);
-  TFTscreen.text(Huippu, 130, 0);
+    TFTscreen.text(Huippu, 130, 0);
   } 
   if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ //tallennetaan arvo eepromiin 200m välein
 	EEPROM.put(100, ekierrokset);
