@@ -21,12 +21,12 @@ void setup() {
   Serial.begin(9600);
   ADCSRB = 0;
   ACSR =						//Analog comparaattorin alustus
-   (0 << ACD) |				
-   (0 << ACBG) |   
-   (0 << ACO) |    
-   (1 << ACI) |    
-   (1 << ACIE) |   
-   (0 << ACIC) |   
+   (0 << ACD)   |				
+   (0 << ACBG)  |   
+   (0 << ACO)   |    
+   (1 << ACI)   |    
+   (1 << ACIE)  |   
+   (0 << ACIC)  |   
    (1 << ACIS1) | 
    (0 << ACIS0);   
   start=millis();
@@ -44,6 +44,7 @@ void setup() {
 }
 
 ISR(ANALOG_COMP_vect) {
+	ACSR=(0 << ACIE);
   fi=1;
   elapsed=millis()-start;
   start=millis();
@@ -59,7 +60,8 @@ ISR(ANALOG_COMP_vect) {
     matka = matka * 0.621371;
   }
   sensorVal = String(kmh);
-  ACSR=(0 << ACIE);
+  ACSR = (1 << ACI);
+  ACSR = (1 << ACIE);
 }
 
 
@@ -79,7 +81,7 @@ void nollaus()
 	vert2=kmh;
 } 
 void loop() 
-{
+{/*
   if(fi==1){
   delay(40);
   fi=0;
@@ -87,7 +89,7 @@ void loop()
   ACSR = (1 << ACI);
   ACSR = (1 << ACIE);
   }
-  
+  */
   matkar=matka-matkaoff;
   del=0;
   f = 0;
