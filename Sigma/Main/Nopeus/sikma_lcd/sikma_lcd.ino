@@ -9,7 +9,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0;
+int sensorPin = 5, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
@@ -28,16 +28,19 @@ void setup() {
    (1 << ACIE) |   
    (0 << ACIC) |   
    (1 << ACIS1) | 
-   (1 << ACIS0);   
+   (0 << ACIS0);   
   start=millis();
   ekierrokset = sizeof(int);
-  //EEPROM.get(110, mph);
-  //EEPROM.get(120, tk);
+  mph = sizeof(int);
+  tk = sizeof(int);
+  EEPROM.get(120, mph);
+  EEPROM.get(140, tk);
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
   MsTimer2::set(3000, nollaus); 
   MsTimer2::start();
+  screenFlag=1;
 }
 
 ISR(ANALOG_COMP_vect) {
@@ -93,6 +96,7 @@ void loop()
     del=del+1;
 	delay(1);
     f=1;
+	ex=0;
   }
   if(del<500 && f==1){
 	  v+=1;
@@ -125,7 +129,6 @@ void loop()
 		}
 		if(del>500 && f==1){
 			switch(ca){
-				
 				case 1:
 					if(mph==0){
 					mph=1;	
@@ -135,7 +138,6 @@ void loop()
 					}
 					Serial.println("c1");
 					break;
-					
 				case 2:
 					otk=tk;
 					tk+=2;
@@ -144,49 +146,112 @@ void loop()
 					}
 					Serial.println("c2");
 					break;
-					
 				case 3:
-				mph = sizeof(int);
-				tk = sizeof(int);
-				//EEPROM.put(110, mph);
-				//EEPROM.put(120, tk);
+				EEPROM.put(120, mph);
+				EEPROM.put(140, tk);
+				Serial.println("c3");
+				TFTscreen.setTextSize(2);
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.line(110, 120, 160, 120);
+				TFTscreen.line(65, 120, 89, 120);
+				TFTscreen.line(0, 120, 48, 120);
+				TFTscreen.text("KM/h", 130, 41);
+				TFTscreen.text(stk, 65, 100);
+				TFTscreen.text("MP/h", 0, 100);
+				TFTscreen.text("KM/h", 0, 100);
+				TFTscreen.text("exit", 110, 100);
+				TFTscreen.stroke(1000, 1000, 1000);
+				TFTscreen.text("saved", 30, 100);
+				delay(1500);
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.text("saved", 30, 100);
+				
+				ca=1;				
 				ex=1;
+				skip=1;
+				screenFlag=1;
 				break;
 				}
 				}
-				
-				if(mph==1){
-				TFTscreen.setTextSize(2);
-				TFTscreen.stroke(0, 0, 0);
-				TFTscreen.text("KM/h", 10, 100);	
-				TFTscreen.setTextSize(2);
-				TFTscreen.stroke(1000, 1000, 1000);
-				TFTscreen.text("MP/h", 10, 100);
-				Serial.println("ifmph");				
-				}		
-				
-				if(mph==0){
-				TFTscreen.setTextSize(2);
-				TFTscreen.stroke(0, 0, 0);
-				TFTscreen.text("MP/h", 10, 100);	
-				TFTscreen.setTextSize(2);
-				TFTscreen.stroke(1000, 1000, 1000);
-				TFTscreen.text("KM/h", 10, 100);
-				Serial.println("ifkmh");					
+				if(skip==0){
+					if(mph==1){
+					TFTscreen.setTextSize(2);
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.text("KM/h", 0, 100);	
+					TFTscreen.setTextSize(2);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.text("MP/h", 0, 100);
+					Serial.println("ifmph");				
+					}		
+					
+					if(mph==0){
+					TFTscreen.setTextSize(2);
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.text("MP/h", 0, 100);	
+					TFTscreen.setTextSize(2);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.text("KM/h", 0, 100);
+					Serial.println("ifkmh");					
+					}
+					Sotk = String (otk);
+					Sotk.toCharArray(sotk, 5);
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.text(sotk, 65, 100);
+					
+					Stk = String (tk);
+					Stk.toCharArray(stk, 5);
+					TFTscreen.stroke(255, 255, 255);
+					TFTscreen.text(stk, 65, 100);
+					Serial.println("loop");
+					Serial.println(mph);
+					
+					TFTscreen.setTextSize(2);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.text("exit", 110, 100);
+					
+					if(ca==1){
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.line(110, 120, 160, 120);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.line(0, 120, 48, 120);
+					}
+					if(ca==2){
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.line(0, 120, 48, 120);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.line(65, 120, 89, 120);
+					}
+					if(ca==3){
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.line(65, 120, 89, 120);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.line(110, 120, 160, 120);
+					}
+					delay(100);
 				}
-				Sotk = String (otk);
-				Sotk.toCharArray(sotk, 5);
-				TFTscreen.stroke(0, 0, 0);
-				TFTscreen.text(sotk, 60, 100);
 				
-				Stk = String (tk);
-				Stk.toCharArray(stk, 5);
-				TFTscreen.stroke(255, 255, 255);
-				TFTscreen.text(stk, 60, 100);
-				Serial.println("loop");
-				Serial.println(mph);
-				delay(100);
-		}
+				if(skip==1){
+				if(mph==1){
+					TFTscreen.setTextSize(1);
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.text("KM/h", 130, 41);
+					TFTscreen.setTextSize(1);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.text("MP/h", 130, 41);
+				}
+				if(mph==0){	
+					TFTscreen.setTextSize(1);
+					TFTscreen.stroke(0, 0, 0);
+					TFTscreen.text("MP/h", 130, 41);
+					TFTscreen.setTextSize(1);
+					TFTscreen.stroke(1000, 1000, 1000);
+					TFTscreen.text("KM/h", 130, 41);
+					
+				}
+				
+				}
+				skip=0;
+		}	
   }
   
   seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
@@ -194,11 +259,9 @@ void loop()
   if(sensorVal != oldVal)
   {
   sensorVal.toCharArray(sensorPrintout, 6);
-  
   TFTscreen.setTextSize(4);
   TFTscreen.stroke(0, 0, 0);
   TFTscreen.text(oldsensor, 0, 20);
-
   TFTscreen.stroke(255, 255, 255);
   TFTscreen.text(sensorPrintout, 0, 20);
    
@@ -216,15 +279,16 @@ void loop()
  Serial.println(sensorPrintout[5]);
  if(mph == 1)
  {
-	 TFTscreen.setTextSize(1);
+	
+	TFTscreen.setTextSize(1);
     TFTscreen.stroke(1000, 1000, 1000);
-  TFTscreen.text("MP/h", 130, 41);
+	TFTscreen.text("MP/h", 130, 41);
  }
  else
  {
-  TFTscreen.setTextSize(1);
+	TFTscreen.setTextSize(1);
     TFTscreen.stroke(1000, 1000, 1000);
-  TFTscreen.text("KM/h", 130, 41);
+	TFTscreen.text("KM/h", 130, 41);
  }
   }
   
@@ -250,7 +314,7 @@ void loop()
 	{
 		TFTscreen.stroke(0, 0, 0);
 		TFTscreen.setTextSize(1);
-		TFTscreen.text("TOTAL", 60, 65);
+		TFTscreen.text("TOTAL", 70, 65);
 		TFTscreen.setTextSize(2);
 		TFTscreen.text(MatkaT, 0, 60);
 		
@@ -258,27 +322,36 @@ void loop()
 		TFTscreen.setTextSize(2);
 		TFTscreen.text(Matka, 0, 60);
 		screenFlag = 0;
+		
+	if(mph == 1)	
+    {
+	  TFTscreen.setTextSize(1);
+	  TFTscreen.stroke(0, 0, 0);
+      TFTscreen.text("km TRIP", 60, 65);
+      TFTscreen.stroke(255, 255, 255);
+      TFTscreen.text("miles TRIP", 60, 65);
+    }
+    if(mph == 0)
+    { 
+      TFTscreen.setTextSize(1);
+	  TFTscreen.stroke(0, 0, 0);
+	  TFTscreen.text("miles TRIP", 60, 65);
+      TFTscreen.stroke(255, 255, 255);
+      TFTscreen.text("km TRIP", 60, 65);
+    }
 	}
 	
 	
   if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)
   {
-  Serial.print(matkar);
-  Serial.print("\t");
-  Serial.print(matkaold);
-  Serial.print("\t");
-	
+	Serial.print(matkar);
+	Serial.print("\t");
+	Serial.print(matkaold);
+	Serial.print("\t");
 	TFTscreen.stroke(0, 0, 0);
-  TFTscreen.setTextSize(1);
-  TFTscreen.text("TOTAL", 60, 65);
-
-  TFTscreen.setTextSize(2);
+	TFTscreen.setTextSize(2);
 	TFTscreen.text(Matka, 0, 60);
-  TFTscreen.text(tunnit, 0, 60);
-  TFTscreen.text(MatkaT, 0, 60);
-	//matkar=matka-matkaoff;
-	
- // Serial.print(matkaold);
+
 	matkaVal = String (matkar);
     matkaVal.toCharArray(Matka, 6);
     TFTscreen.stroke(255, 255, 255);
@@ -286,17 +359,7 @@ void loop()
     TFTscreen.setTextSize(2);
     TFTscreen.text(Matka, 0, 60);
     matkaold=matkar;
-  }
-    if(mph == 1)
-    {
-      TFTscreen.setTextSize(1);
-      TFTscreen.text("miles TRIP", 60, 65);
-    }
-    else
-    {
-      TFTscreen.setTextSize(1);
-      TFTscreen.text("km TRIP", 60, 65);
-    }
+	}
  Serial.println("CASE1");
  
 	break;
@@ -327,7 +390,6 @@ void loop()
 	if(seconds!=oldseconds){
  Serial.println("CASE2");
  TFTscreen.setTextSize(2);
- Serial.print(secondsoff);
  
 	
 	oldseconds=seconds;
@@ -337,8 +399,8 @@ void loop()
     m = t % 60;
     t = (t - m)/60;
     h = t;
-TFTscreen.setTextSize(1);
-  TFTscreen.stroke(0, 0, 0);
+ TFTscreen.setTextSize(1);
+ TFTscreen.stroke(0, 0, 0);
  TFTscreen.text("miles TRIP", 60, 65);
  TFTscreen.text("km TRIP", 60, 65);
  TFTscreen.setTextSize(2);
@@ -350,9 +412,6 @@ TFTscreen.setTextSize(1);
 	ultoa(m,mnc,10);
 	ultoa(h,hrc,10);
 	
-	Serial.println(secc);
-	Serial.println(mnc);
-
   strcpy(tunnit, hrc);
   strcat(tunnit, ":");
   strcpy(minuutit, mnc);
@@ -378,7 +437,7 @@ TFTscreen.setTextSize(1);
 		TFTscreen.setTextSize(2);
 		TFTscreen.text(MatkaT, 0, 60);
 		TFTscreen.setTextSize(1);
-		TFTscreen.text("TOTAL", 60, 65);
+		TFTscreen.text("TOTAL", 70, 65);
 		screenFlag = 0;
 	}
   if(roundf(matkav * 100) != roundf(ematka * 100))
@@ -396,27 +455,24 @@ TFTscreen.setTextSize(1);
   TFTscreen.text(MatkaT, 0, 60);
   }
   TFTscreen.setTextSize(1);
-  TFTscreen.text("TOTAL", 60, 65);
+  TFTscreen.text("TOTAL", 70, 65);
   Serial.println("CASE3");
   break;
   
   case 4:
   
   
-  
-  
+  Serial.println("CASE4");
+  delay(100);
   break;
 }
 }
 
   void tftSetup()
   {
-  // clear the screen with a black background
   TFTscreen.background(0,0,0);
   TFTscreen.stroke(1000, 200, 200);
-  // set the font size
   TFTscreen.setTextSize(2);
-  // write the text to the top left corner of the screen
   TFTscreen.text("SIKMA ", 0, 0);
   TFTscreen.line(0, 55, 160, 55);    
   }
