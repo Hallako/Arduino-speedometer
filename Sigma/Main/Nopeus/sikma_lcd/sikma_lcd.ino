@@ -9,7 +9,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,otk,f,kierrokset = 0,ekierrokset,ca,screenFlag=0,ex=0;
+int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
@@ -31,8 +31,8 @@ void setup() {
    (1 << ACIS0);   
   start=millis();
   ekierrokset = sizeof(int);
-  EEPROM.get(110, mph);
-  EEPROM.get(120, tk);
+  //EEPROM.get(110, mph);
+  //EEPROM.get(120, tk);
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
@@ -113,19 +113,19 @@ void loop()
 	f=0;
 		while(digitalRead(5) == HIGH)
 		{
+		del+=1;
 		f=1;
 		delay(1);
 		}
-		
 		if(del<500 && f==1){
 		ca+=1;
 		if(ca==4){
 		ca=1;
 		}
 		}
-		
 		if(del>500 && f==1){
 			switch(ca){
+				
 				case 1:
 					if(mph==0){
 					mph=1;	
@@ -133,7 +133,8 @@ void loop()
 					else{
 					mph=0;
 					}
-					break;	
+					Serial.println("c1");
+					break;
 					
 				case 2:
 					otk=tk;
@@ -141,21 +142,27 @@ void loop()
 					if(tk>30){
 					tk=20;
 					}
+					Serial.println("c2");
+					break;
+					
 				case 3:
 				mph = sizeof(int);
 				tk = sizeof(int);
-				EEPROM.put(110, mph);
-				EEPROM.put(120, tk);
+				//EEPROM.put(110, mph);
+				//EEPROM.put(120, tk);
 				ex=1;
+				break;
 				}
 				}
+				
 				if(mph==1){
 				TFTscreen.setTextSize(2);
 				TFTscreen.stroke(0, 0, 0);
 				TFTscreen.text("KM/h", 10, 100);	
 				TFTscreen.setTextSize(2);
 				TFTscreen.stroke(1000, 1000, 1000);
-				TFTscreen.text("MP/h", 10, 100);	
+				TFTscreen.text("MP/h", 10, 100);
+				Serial.println("ifmph");				
 				}		
 				
 				if(mph==0){
@@ -164,7 +171,8 @@ void loop()
 				TFTscreen.text("MP/h", 10, 100);	
 				TFTscreen.setTextSize(2);
 				TFTscreen.stroke(1000, 1000, 1000);
-				TFTscreen.text("KM/h", 10, 100);	
+				TFTscreen.text("KM/h", 10, 100);
+				Serial.println("ifkmh");					
 				}
 				Sotk = String (otk);
 				Sotk.toCharArray(sotk, 5);
@@ -175,6 +183,9 @@ void loop()
 				Stk.toCharArray(stk, 5);
 				TFTscreen.stroke(255, 255, 255);
 				TFTscreen.text(stk, 60, 100);
+				Serial.println("loop");
+				Serial.println(mph);
+				delay(100);
 		}
   }
   
