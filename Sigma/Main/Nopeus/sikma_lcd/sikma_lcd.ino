@@ -9,10 +9,10 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,f,kierrokset = 0,ekierrokset;
+int sensorPin = 5, v=1,del=0,mph = 0,fi,tk=22,otk,f,kierrokset = 0,ekierrokset,ca,screenFlag=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
-char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0};
-String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu;
+char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
+String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
 char minuutit[10], sekunnit[10], tunnit[10];
 
 void setup() {
@@ -31,6 +31,8 @@ void setup() {
    (1 << ACIS0);   
   start=millis();
   ekierrokset = sizeof(int);
+  EEPROM.get(110, mph);
+  EEPROM.get(120, tk);
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
@@ -90,32 +92,100 @@ void loop()
   {
     del=del+1;
 	delay(1);
- f=1;
+    f=1;
   }
   if(del<500 && f==1){
 	  v+=1;
+	  screenFlag=1;
 	if(v>4){
 	v=1;
 	
   }
   }
-  if(del>500 && f==1){
+  if(del>500 && f==1 && del<5000){
 	secondsoff = millis() / 1000;
 	matkaoff = matka;
 	huippu=0;
   }
   if(del>5000 && f==1){
 	for(;;){
-	while(digitalRead(5) == HIGH)
-    {
- 
-    }
-    if(del<500 && f==1){
-	
-		
-	}
+	del=0;
+	f=0;
+		while(digitalRead(5) == HIGH)
+		{
+		f=1;
+		delay(1);
+		}
+		if(del<500 && f==1){
+		ca+=1;
+		if(ca==4){
+		ca=1;
+		}
+		}
+		if(del>500 && f==1){
+			switch(ca){
+				case 1:
+					if(mph==0){
+					mph=1;	
+					}
+					else{
+					mph=0;
+					}
+					break;	
+					
+				case 2:
+					otk=tk;
+					tk+=2;
+					if(tk>30){
+					tk=20;
+					}
+				case 3:
+				mph = sizeof(int);
+				tk = sizeof(int);
+				EEPROM.put(110, mph);
+				EEPROM.put(120, tk);
+				return 1;
+				}
+				}
+				if(mph==1){
+				TFTscreen.setTextSize(2);
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.text("KM/h", 10, 100);	
+				TFTscreen.setTextSize(2);
+				TFTscreen.stroke(1000, 1000, 1000);
+				TFTscreen.text("MP/h", 10, 100);	
+				}		
+				
+				if(mph==0){
+				TFTscreen.setTextSize(2);
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.text("MP/h", 10, 100);	
+				TFTscreen.setTextSize(2);
+				TFTscreen.stroke(1000, 1000, 1000);
+				TFTscreen.text("KM/h", 10, 100);	
+				}
+				
+				Sotk = String (otk);
+				Sotk.toCharArray(sotk, 5);
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.text(sotk, 60, 100);
+				
+				Stk = String (tk);
+				Stk.toCharArray(stk, 5);
+				TFTscreen.stroke(255, 255, 255);
+				TFTscreen.text(stk, 60, 100);
+				
+				
+				
+				
+				
+				
+				
+				
+				
+		}
   }
-  }
+  
   seconds = (millis() / 1000)-secondsoff;  	//secondsoff = offset resetistä.
  
   if(sensorVal != oldVal)
@@ -173,6 +243,19 @@ void loop()
   }
 	switch (v){
 	case 1:
+	if(screenFlag == 1)
+	{
+		TFTscreen.stroke(0, 0, 0);
+		TFTscreen.setTextSize(1);
+		TFTscreen.text("TOTAL", 60, 65);
+		TFTscreen.setTextSize(2);
+		TFTscreen.text(MatkaT, 0, 60);
+		
+		TFTscreen.stroke(255, 255, 255);
+		TFTscreen.setTextSize(2);
+		TFTscreen.text(Matka, 0, 60);
+		screenFlag = 0;
+	}
 	
 	
   if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)
@@ -216,7 +299,28 @@ void loop()
 	break;
  
 	case 2:
-	
+	if(screenFlag == 1)
+	{		if(mph == 1)
+			{	
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.setTextSize(1);
+				TFTscreen.text("miles TRIP", 60, 65);
+			}
+			else
+			{
+				TFTscreen.stroke(0, 0, 0);
+				TFTscreen.setTextSize(1);
+				TFTscreen.text("km TRIP", 60, 65);
+			}
+		TFTscreen.stroke(0, 0, 0);
+		TFTscreen.setTextSize(2);
+		TFTscreen.text(Matka, 0, 60);
+		
+		TFTscreen.stroke(255, 255, 255);
+		TFTscreen.setTextSize(2);
+		TFTscreen.text(tunnit, 0, 60);
+		screenFlag = 0;
+	}
 	if(seconds!=oldseconds){
  Serial.println("CASE2");
  TFTscreen.setTextSize(2);
@@ -261,7 +365,19 @@ TFTscreen.setTextSize(1);
 	break;
 	
 	case 3:
-  
+    if(screenFlag == 1)
+	{	
+		TFTscreen.stroke(0, 0, 0);
+		TFTscreen.setTextSize(2);
+		TFTscreen.text(tunnit, 0, 60);
+		
+		TFTscreen.stroke(255, 255, 255);
+		TFTscreen.setTextSize(2);
+		TFTscreen.text(MatkaT, 0, 60);
+		TFTscreen.setTextSize(1);
+		TFTscreen.text("TOTAL", 60, 65);
+		screenFlag = 0;
+	}
   if(roundf(matkav * 100) != roundf(ematka * 100))
   {
   TFTscreen.setTextSize(2);
@@ -288,8 +404,8 @@ TFTscreen.setTextSize(1);
   
   break;
 }
-
 }
+
   void tftSetup()
   {
   // clear the screen with a black background
