@@ -14,21 +14,44 @@ float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkao
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
 char minuutit[10], sekunnit[10], tunnit[10];
+int muuttuja;
+
 
 void setup() {
   TFTscreen.begin();
   tftSetup();
   Serial.begin(9600);
-  ADCSRB = 0;
-  ACSR =						//Analog comparaattorin alustus
-   (0 << ACD)   |				
-   (0 << ACBG)  |   
-   (0 << ACO)   |    
-   (1 << ACI)   |    
-   (1 << ACIE)  |   
-   (0 << ACIC)  |   
-   (1 << ACIS1) | 
-   (0 << ACIS0);   
+  ADCSRB &= ~(1 << ACME);
+  ACSR = B00011011;
+/*	ACSR |= (1 << ACIS1) ; 
+	ACSR |=(1 << ACIS0); 		//Analog comparaattorin alustus
+   ACSR |=(0 << ACD)   ;				
+   ACSR |=(0 << ACBG)  ;      
+   ACSR |= (0 << ACI)   ;    
+  ACSR |= (1 << ACIE)  ;   
+  ACSR |= (0 << ACIC)  ; 
+*/
+
+//bitSet(0x30, 0);
+//bitSet(0x30, 1);
+/*
+bitSet(0x30, 1);
+bitSet(0x30, 2);
+bitSet(0x30, 3);
+bitSet(0x30, 4);
+bitSet(0x30, 5);
+bitSet(0x30, 6);
+bitSet(0x30, 7);*/
+  /*
+   ACSR &= ~_BV(ACD);
+   ACSR &= ~_BV(ACBG);
+   ACSR &= ~_BV(ACO);
+   ACSR |= _BV(ACI);
+   ACSR |= _BV(ACIE);
+   ACSR &= ~_BV(ACIC);
+   ACSR &= ~_BV(ACIS1);
+   ACSR &= ~_BV(ACIS0);*/
+   
   start=millis();
   ekierrokset = sizeof(int);
   mph = sizeof(int);
@@ -44,7 +67,7 @@ void setup() {
 }
 
 ISR(ANALOG_COMP_vect) {
-	ACSR=(0 << ACIE);
+	ACSR|=(0 << ACIE);
   fi=1;
   elapsed=millis()-start;
   start=millis();
@@ -60,8 +83,19 @@ ISR(ANALOG_COMP_vect) {
     matka = matka * 0.621371;
   }
   sensorVal = String(kmh);
-  ACSR = (1 << ACI);
-  ACSR = (1 << ACIE);
+Serial.println("isr");
+ 
+Serial.println(bitRead(0x30, 0));
+Serial.println(bitRead(0x30, 1));
+Serial.println(bitRead(0x30, 2));
+Serial.println(bitRead(0x30, 3));
+Serial.println(bitRead(0x30, 4));
+Serial.println(bitRead(0x30, 5));
+Serial.println(bitRead(0x30, 6));
+Serial.println(bitRead(0x30, 7));
+
+  ACSR |= (1 << ACI);
+  ACSR |= (1 << ACIE);
 }
 
 
@@ -266,7 +300,8 @@ void loop()
   TFTscreen.text(oldsensor, 0, 20);
   TFTscreen.stroke(255, 255, 255);
   TFTscreen.text(sensorPrintout, 0, 20);
-   
+   Serial.println(bitRead(0x30, 0));
+
 //ottaa vanhan arvon talteen näytön tyhjennystä varten
    oldVal = String (sensorPrintout);
    oldVal.toCharArray(oldsensor, 6);
@@ -425,6 +460,14 @@ void loop()
   
     TFTscreen.stroke(255, 255, 255);
     TFTscreen.text(tunnit, 0, 60);
+	Serial.println(bitRead(0x30, 0));
+Serial.println(bitRead(0x30, 1));
+Serial.println(bitRead(0x30, 2));
+Serial.println(bitRead(0x30, 3));
+Serial.println(bitRead(0x30, 4));
+Serial.println(bitRead(0x30, 5));
+Serial.println(bitRead(0x30, 6));
+Serial.println(bitRead(0x30, 7));
 	}
 	break;
 	
