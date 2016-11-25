@@ -65,11 +65,13 @@ bitSet(0x30, 7);
   MsTimer2::set(3000, nollaus); 
   MsTimer2::start();
   screenFlag=1;
-  attachInterrupt(digitalPinToInterrupt(7), trig, FALLING);
+  attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);
+  pinMode(2,INPUT);
 }
 
 void trig() {
 	//ACSR|=(0 << ACIE);
+	noInterrupts();
   fi=1;
   elapsed=millis()-start;
   start=millis();
@@ -107,12 +109,15 @@ void nollaus()
 	vert2=kmh;
 } 
 void loop() 
-{/*
+{
   if(fi==1){
-  delay(40);
+	  
+  delay(80);
+  interrupts();
   fi=0;
   }
-  */
+  
+  
   matkar=matka-matkaoff;
   del=0;
   f = 0;
@@ -283,26 +288,19 @@ void loop()
  
   if(sensorVal != oldVal)
   {
+	  noInterrupts();
   sensorVal.toCharArray(sensorPrintout, 6);
   TFTscreen.setTextSize(4);
   TFTscreen.stroke(0, 0, 0);
   TFTscreen.text(oldsensor, 0, 20);
   TFTscreen.stroke(255, 255, 255);
   TFTscreen.text(sensorPrintout, 0, 20);
-   Serial.println(bitRead(0x30, 0));
-
+	
 //ottaa vanhan arvon talteen näytön tyhjennystä varten
-   oldVal = String (sensorPrintout);
+   oldVal = sensorVal;
    oldVal.toCharArray(oldsensor, 6);
+	
 
-
- 
- Serial.print(sensorPrintout[0]);
- Serial.print(sensorPrintout[1]);
- Serial.print(sensorPrintout[2]);
- Serial.print(sensorPrintout[3]);
- Serial.print(sensorPrintout[4]);
- Serial.println(sensorPrintout[5]);
  if(mph == 1)
  {
 	
@@ -316,6 +314,7 @@ void loop()
     TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text("KM/h", 130, 41);
  }
+ interrupts();
   }
   
   if(huippu < kmh && huippu <1000)
