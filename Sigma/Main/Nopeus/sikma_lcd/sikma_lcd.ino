@@ -67,6 +67,7 @@ bitSet(0x30, 7);
   screenFlag=1;
   attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);
   pinMode(2,INPUT);
+  pinMode(5,INPUT);
 }
 
 void trig() {
@@ -92,7 +93,23 @@ Serial.println("trig");
  // ACSR |= (1 << ACIE);
 }
 
-
+void sleepNow()
+{
+	attachInterrupt(0, pinInterrupt, LOW);
+	delay(100);
+    set_sleep_mode(SLEEP_PWR_DOWN);
+ 
+    // Set sleep enable (SE) bit:
+    sleep_enable();
+ 
+    // Put the device to sleep:
+	digitalWrite(5,LOW);
+    sleep_mode();
+ 
+    // Upon waking up, sketch continues from this point.
+    sleep_disable();
+	digitalWrite(5,HIGH);
+}
 void reset()
 {
 	secondsoff = millis() / 1000;
@@ -113,6 +130,7 @@ void loop()
   if(fi==1){
 	  
   delay(80);
+  EIMSK |= (0 << INT0);
   interrupts();
   fi=0;
   }
