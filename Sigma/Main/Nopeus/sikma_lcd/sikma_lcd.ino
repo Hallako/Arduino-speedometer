@@ -11,7 +11,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0,screenflag;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
@@ -23,38 +23,6 @@ void setup() {
   TFTscreen.begin();
   tftSetup();
   Serial.begin(9600);
- /* 
- ADCSRB &= ~(1 << ACME);
-  ACSR = B00011011;
-	ACSR |= (1 << ACIS1) ; 
-	ACSR |=(1 << ACIS0); 		//Analog comparaattorin alustus
-   ACSR |=(0 << ACD)   ;				
-   ACSR |=(0 << ACBG)  ;      
-   ACSR |= (0 << ACI)   ;    
-  ACSR |= (1 << ACIE)  ;   
-  ACSR |= (0 << ACIC)  ; 
-
-
-//bitSet(0x30, 0);
-//bitSet(0x30, 1);
-
-bitSet(0x30, 1);
-bitSet(0x30, 2);
-bitSet(0x30, 3);
-bitSet(0x30, 4);
-bitSet(0x30, 5);
-bitSet(0x30, 6);
-bitSet(0x30, 7);
-  
-   ACSR &= ~_BV(ACD);
-   ACSR &= ~_BV(ACBG);
-   ACSR &= ~_BV(ACO);
-   ACSR |= _BV(ACI);
-   ACSR |= _BV(ACIE);
-   ACSR &= ~_BV(ACIC);
-   ACSR &= ~_BV(ACIS1);
-   ACSR &= ~_BV(ACIS0);
-   */ 
   start=millis();
   ekierrokset = sizeof(int);
   mph = sizeof(int);
@@ -64,7 +32,7 @@ bitSet(0x30, 7);
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
-  MsTimer2::set(5000, nollaus); 
+  MsTimer2::set(4000, nollaus); 
   MsTimer2::start();
   screenFlag=1;
   attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);
@@ -74,47 +42,47 @@ bitSet(0x30, 7);
 }
 
 void trig() {
-	//ACSR|=(0 << ACIE);
-	noInterrupts();
+  noInterrupts();
   fi=1;
   elapsed=millis()-start;
   start=millis();
-    float revs = 60000/elapsed;
-    kmh = ((tk*2.54*3.1459)*revs*60/100000);
+  float revs = 60000/elapsed;
+  kmh = ((tk*2.54*3.1459)*revs*60/100000);
   kierrokset += 1;
   ekierrokset += 1;
   matka = kierrokset * (tk*2.54*3.1459)/100000;
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
+  
  if(mph==1)
   {
     kmh = kmh * 0.621371;
     matka = matka * 0.621371;
   }
+  
   sensorVal = String(kmh);
-Serial.println("trig");
- // ACSR |= (1 << ACI);
- // ACSR |= (1 << ACIE);
+  Serial.println("trig");
 }
 void wakeUp()
 {
- 
+	sleepflag=0;
 }
 void sleepNow(void)
 {
+	
 	sleepFlag=0;
-	//	attachInterrupt(1, pinInterrupt, LOW);
 	delay(100);
     set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
 	power_timer2_disable();
-    // Set sleep enable (SE) bit:
     sleep_enable();
  
     // Put the device to sleep:
-Serial.println("IDLESLeep");
+	Serial.println("IDLESLeep");
     sleep_mode();
+	
+	//poistuu unesta
 	sleep_disable();
 	power_timer2_enable();
-	//detachInterrupt(1);
+	
 
 }
 void reset()
@@ -125,16 +93,13 @@ void reset()
 
 void nollaus()
 {
-	
 	vert1=kmh;
 	if(vert1==vert2){
 	kmh=0;	
 	sensorVal = String(kmh);
-	sleepFlag=1;
-	
+	sleepFlag+=1;
 		}
 	vert2=kmh;
-
 } 
 void loop() 
 {
@@ -315,7 +280,6 @@ void loop()
 					TFTscreen.text("KM/h", 130, 41);
 					
 				}
-				
 				}
 				skip=0;
 		}	
@@ -325,7 +289,7 @@ void loop()
  
   if(sensorVal != oldVal)
   {
-	  noInterrupts();
+	noInterrupts();
   sensorVal.toCharArray(sensorPrintout, 6);
   TFTscreen.setTextSize(4);
   TFTscreen.stroke(0, 0, 0);
@@ -538,8 +502,12 @@ Serial.println(bitRead(0x30, 7));
 }
 if(sleepFlag==1)
 {
-	Serial.println("GotoSleep");
-	sleepNow();
+	sleepflag+=1;
+	if(sleepflag==10){
+		sleepflag=0;
+		Serial.println("GotoSleep");
+		sleepNow();
+		}
 }
 }
 
