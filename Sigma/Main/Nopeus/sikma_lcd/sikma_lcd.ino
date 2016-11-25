@@ -10,7 +10,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},sotk[5],stk[5];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
@@ -63,12 +63,11 @@ bitSet(0x30, 7);
   EEPROM.get(100, ekierrokset);
   ematka = ekierrokset * (tk*2.54*3.1459)/100000;
   matkat=ematka;
-  MsTimer2::set(3000, nollaus); 
+  MsTimer2::set(5000, nollaus); 
   MsTimer2::start();
   screenFlag=1;
   attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);
   pinMode(2,INPUT);
-  pinMode(5,INPUT);
 }
 
 void trig() {
@@ -95,24 +94,24 @@ Serial.println("trig");
 }
 void pinInterrupt(void)
 {
-    detachInterrupt(1);
+    //detachInterrupt(1);
 }
 void sleepNow(void)
 {
-	//delay(100);
-    set_sleep_mode(SLEEP_MODE_IDLE);
- attachInterrupt(1, pinInterrupt, LOW);
+	sleepFlag=0;
+	//	attachInterrupt(1, pinInterrupt, LOW);
+	delay(100);
+    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
+
     // Set sleep enable (SE) bit:
     sleep_enable();
  
     // Put the device to sleep:
-	digitalWrite(5,LOW);
+Serial.println("IDLESLeep");
     sleep_mode();
- 
-    // Upon waking up, sketch continues from this point.
-    sleep_disable();
-	digitalWrite(5,HIGH);
-	detachInterrupt(1);
+	sleep_disable();
+	//detachInterrupt(1);
+
 }
 void reset()
 {
@@ -122,20 +121,20 @@ void reset()
 
 void nollaus()
 {
+	
 	vert1=kmh;
 	if(vert1==vert2){
 	kmh=0;	
 	sensorVal = String(kmh);
-	}
+	sleepFlag=1;
+	
+		}
 	vert2=kmh;
+
 } 
 void loop() 
 {
-	if(minuutit==1)
-	{
-		Serial.println("SleepNow!");
-		sleepNow();
-	}
+
   if(fi==1){
 	  
   delay(80);
@@ -154,6 +153,9 @@ void loop()
 	delay(1);
     f=1;
 	ex=0;
+	if(del>3600){
+		break;
+	}
   }
   if(del<500 && f==1){
 	  v+=1;
@@ -168,7 +170,11 @@ void loop()
 	matkaoff = matka;
 	huippu=0;
   }
-  if(del>5000 && f==1){
+  if(del>3500 && f==1){
+	  delay(1000);
+	  del=0;
+	  f=0;
+	
 	for(;ex!=1;){
 	del=0;
 	f=0;
@@ -525,6 +531,11 @@ Serial.println(bitRead(0x30, 7));
   Serial.println("CASE4");
   delay(100);
   break;
+}
+if(sleepFlag==1)
+{
+	Serial.println("GotoSleep");
+	sleepNow();
 }
 }
 
