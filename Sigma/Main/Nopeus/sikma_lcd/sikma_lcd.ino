@@ -21,28 +21,29 @@ void setup() {
   TFTscreen.begin();
   tftSetup();
   Serial.begin(9600);
-  ADCSRB &= ~(1 << ACME);
+ /* 
+ ADCSRB &= ~(1 << ACME);
   ACSR = B00011011;
-/*	ACSR |= (1 << ACIS1) ; 
+	ACSR |= (1 << ACIS1) ; 
 	ACSR |=(1 << ACIS0); 		//Analog comparaattorin alustus
    ACSR |=(0 << ACD)   ;				
    ACSR |=(0 << ACBG)  ;      
    ACSR |= (0 << ACI)   ;    
   ACSR |= (1 << ACIE)  ;   
   ACSR |= (0 << ACIC)  ; 
-*/
+
 
 //bitSet(0x30, 0);
 //bitSet(0x30, 1);
-/*
+
 bitSet(0x30, 1);
 bitSet(0x30, 2);
 bitSet(0x30, 3);
 bitSet(0x30, 4);
 bitSet(0x30, 5);
 bitSet(0x30, 6);
-bitSet(0x30, 7);*/
-  /*
+bitSet(0x30, 7);
+  
    ACSR &= ~_BV(ACD);
    ACSR &= ~_BV(ACBG);
    ACSR &= ~_BV(ACO);
@@ -50,8 +51,8 @@ bitSet(0x30, 7);*/
    ACSR |= _BV(ACIE);
    ACSR &= ~_BV(ACIC);
    ACSR &= ~_BV(ACIS1);
-   ACSR &= ~_BV(ACIS0);*/
-   
+   ACSR &= ~_BV(ACIS0);
+   */ 
   start=millis();
   ekierrokset = sizeof(int);
   mph = sizeof(int);
@@ -64,10 +65,11 @@ bitSet(0x30, 7);*/
   MsTimer2::set(3000, nollaus); 
   MsTimer2::start();
   screenFlag=1;
+  attachInterrupt(digitalPinToInterrupt(7), trig, FALLING);
 }
 
-ISR(ANALOG_COMP_vect) {
-	ACSR|=(0 << ACIE);
+void trig() {
+	//ACSR|=(0 << ACIE);
   fi=1;
   elapsed=millis()-start;
   start=millis();
@@ -83,19 +85,9 @@ ISR(ANALOG_COMP_vect) {
     matka = matka * 0.621371;
   }
   sensorVal = String(kmh);
-Serial.println("isr");
- 
-Serial.println(bitRead(0x30, 0));
-Serial.println(bitRead(0x30, 1));
-Serial.println(bitRead(0x30, 2));
-Serial.println(bitRead(0x30, 3));
-Serial.println(bitRead(0x30, 4));
-Serial.println(bitRead(0x30, 5));
-Serial.println(bitRead(0x30, 6));
-Serial.println(bitRead(0x30, 7));
-
-  ACSR |= (1 << ACI);
-  ACSR |= (1 << ACIE);
+Serial.println("trig");
+ // ACSR |= (1 << ACI);
+ // ACSR |= (1 << ACIE);
 }
 
 
@@ -119,9 +111,6 @@ void loop()
   if(fi==1){
   delay(40);
   fi=0;
-  delay(40);
-  ACSR = (1 << ACI);
-  ACSR = (1 << ACIE);
   }
   */
   matkar=matka-matkaoff;
