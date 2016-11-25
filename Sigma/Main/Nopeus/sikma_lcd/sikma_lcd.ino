@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include <EEPROM.h>
 #include <MsTimer2.h>
+#include <avr/sleep.h>
 
 #define cs   10
 #define dc   9
@@ -92,13 +93,15 @@ Serial.println("trig");
  // ACSR |= (1 << ACI);
  // ACSR |= (1 << ACIE);
 }
-
-void sleepNow()
+void pinInterrupt(void)
 {
-	attachInterrupt(0, pinInterrupt, LOW);
-	delay(100);
-    set_sleep_mode(SLEEP_PWR_DOWN);
- 
+    detachInterrupt(1);
+}
+void sleepNow(void)
+{
+	//delay(100);
+    set_sleep_mode(SLEEP_MODE_IDLE);
+ attachInterrupt(1, pinInterrupt, LOW);
     // Set sleep enable (SE) bit:
     sleep_enable();
  
@@ -109,6 +112,7 @@ void sleepNow()
     // Upon waking up, sketch continues from this point.
     sleep_disable();
 	digitalWrite(5,HIGH);
+	detachInterrupt(1);
 }
 void reset()
 {
@@ -127,6 +131,11 @@ void nollaus()
 } 
 void loop() 
 {
+	if(minuutit==1)
+	{
+		Serial.println("SleepNow!");
+		sleepNow();
+	}
   if(fi==1){
 	  
   delay(80);
