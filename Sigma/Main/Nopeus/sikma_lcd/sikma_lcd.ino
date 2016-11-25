@@ -3,6 +3,7 @@
 #include <EEPROM.h>
 #include <MsTimer2.h>
 #include <avr/sleep.h>
+#include <avr/power.h>
 
 #define cs   10
 #define dc   9
@@ -67,7 +68,9 @@ bitSet(0x30, 7);
   MsTimer2::start();
   screenFlag=1;
   attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);
+  attachInterrupt(digitalPinToInterrupt(3), wakeUp, RISING);
   pinMode(2,INPUT);
+  pinMode(3,INPUT);
 }
 
 void trig() {
@@ -92,17 +95,17 @@ Serial.println("trig");
  // ACSR |= (1 << ACI);
  // ACSR |= (1 << ACIE);
 }
-void pinInterrupt(void)
+void wakeUp()
 {
-    //detachInterrupt(1);
+ 
 }
 void sleepNow(void)
 {
 	sleepFlag=0;
 	//	attachInterrupt(1, pinInterrupt, LOW);
 	delay(100);
-    set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-
+    set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
+	power_timer2_disable();
     // Set sleep enable (SE) bit:
     sleep_enable();
  
@@ -110,6 +113,7 @@ void sleepNow(void)
 Serial.println("IDLESLeep");
     sleep_mode();
 	sleep_disable();
+	power_timer2_enable();
 	//detachInterrupt(1);
 
 }
