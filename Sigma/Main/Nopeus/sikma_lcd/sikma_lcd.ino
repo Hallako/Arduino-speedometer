@@ -14,7 +14,7 @@ unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
 int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0,sleepflag;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},
-	sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
+sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
 char ;
 int muuttuja;
