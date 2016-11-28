@@ -20,19 +20,19 @@ char ;
 int muuttuja;
 
 void setup() {
-	TFTscreen.begin();										//Alustetaan näyttö.
+	TFTscreen.begin();												//Alustetaan näyttö.
 	tftSetup();
 	Serial.begin(9600);
 	start=millis();
-	ekierrokset = sizeof(int);								//asetetaan muuttujille koot.
+	ekierrokset = sizeof(int);										//asetetaan muuttujille koot.
 	mph = sizeof(int);
 	tk = sizeof(int);	
-	EEPROM.get(120, mph);									//Haetaan eepromista arvot matkalle ja muuttujille.
+	EEPROM.get(120, mph);											//Haetaan eepromista arvot matkalle ja muuttujille.
 	EEPROM.get(140, tk);
 	EEPROM.get(100, ekierrokset);
 	ematka = ekierrokset * (tk*2.54*3.1459)/100000;
 	matkat=ematka;
-	MsTimer2::set(4000, nollaus); 							//Alustetaan timer nollaukselle.
+	MsTimer2::set(4000, nollaus); 									//Alustetaan timer nollaukselle.
 	MsTimer2::start();
 	screenFlag=1;
 	attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);		//Alustetaan keskeytykset.
@@ -41,7 +41,7 @@ void setup() {
 	pinMode(3,INPUT);
 }
 
-void trig() {											//keskeytysfunktio joka laskee matkan ja nopeuden.
+void trig() {												//keskeytysfunktio joka laskee matkan ja nopeuden.
 	noInterrupts();
 	fi=1;
 	elapsed=millis()-start;
@@ -63,18 +63,18 @@ void wakeUp()
 {
 	sleepflag=0;
 }
-void sleepNow(void)										//Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
+void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
 {
 	sleepFlag=0;
 	delay(100);
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
 	power_timer2_disable();
 	sleep_enable();
-	sleep_mode();					//menee uneen.
-	sleep_disable();				//poistuu unesta.
+	sleep_mode();											//menee uneen.
+	sleep_disable();										//poistuu unesta.
 	power_timer2_enable();
 }
-void reset()						//reset funktio tripille ja ajastimelle.
+void reset()												//reset funktio tripille ja ajastimelle.
 {
 	secondsoff = millis() / 1000;
 	matkaoff = matka;
@@ -89,7 +89,7 @@ void reset()						//reset funktio tripille ja ajastimelle.
 	TFTscreen.text(Huippu, 130, 0);
 }
 
-void nollaus()						//Nolla nopeuden kun ei liikuta.
+void nollaus()												//Nolla nopeuden kun ei liikuta.
 {
 	vert1=kmh;
 	if(vert1==vert2){
@@ -136,19 +136,19 @@ void loop()
 		for(;ex!=1;){
 		del=0;
 		f=0;
-			while(digitalRead(5) == HIGH)		//Aloitetaan ajastus
+			while(digitalRead(5) == HIGH)						//Aloitetaan ajastus
 			{
 			del+=1;
 			f=1;
 			delay(1);
 			}
-				if(del<500 && f==1){				//lyhyt painallus seuraava kohta.
+				if(del<500 && f==1){							//lyhyt painallus seuraava kohta.
 				ca+=1;
 					if(ca==4){
 					ca=1;
 					}
 				}
-				if(del>500 && f==1){				//pitkä painallus muuttaa arvoa tai poistuu.
+				if(del>500 && f==1){							//pitkä painallus muuttaa arvoa tai poistuu.
 					switch(ca){
 						case 1:									//case 1: mph tai kmh valinta.
 							if(mph==0){
@@ -197,14 +197,14 @@ void loop()
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.text("KM/h", 0, 100);	
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("MP/h", 0, 100);			
+							TFTscreen.text("MP/h", 0, 100);	
 							}		
 							if(mph==0){
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.text("MP/h", 0, 100);	
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("KM/h", 0, 100);				
+							TFTscreen.text("KM/h", 0, 100);	
 							}
 						Sotk = String (otk);
 						Sotk.toCharArray(sotk, 5);
@@ -276,7 +276,7 @@ void loop()
 	}
 	seconds = (millis() / 1000)-secondsoff;  			//secondsoff = offset resetistä.
   
-	if(sensorVal != oldVal)							//päivitetään nopeus mikäli muuttunut.
+	if(sensorVal != oldVal)								//päivitetään nopeus mikäli muuttunut.
 	{							
 	noInterrupts();
 	sensorVal.toCharArray(sensorPrintout, 6);
@@ -285,7 +285,7 @@ void loop()
 	TFTscreen.text(oldsensor, 0, 20);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(sensorPrintout, 0, 20);
-	oldVal = sensorVal;								//ottaa vanhan arvon talteen näytön tyhjennystä varten
+	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
 	oldVal.toCharArray(oldsensor, 6);
 	
 	if(mph == 1)										//piirtää mailit mikäli valittu muuten kmh
@@ -304,7 +304,7 @@ void loop()
 	interrupts();
 	}
   
-	if(huippu < kmh && kmh<120)									//huippu arvon päivitys
+	if(huippu < kmh && kmh<120)							//huippu arvon päivitys
 	{
 	TFTscreen.setTextSize(1);
 	TFTscreen.stroke(0, 0, 0);
@@ -321,10 +321,10 @@ void loop()
 	matkat=ematka;
 	}
 	
-	switch (v){ 										//näyttö moodin valinta
-	case 1:												//case 1: trippi mittari
+	switch (v){ 											//näyttö moodin valinta
+	case 1:													//case 1: trippi mittari
 	
-	if(screenFlag == 1)									//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
+	if(screenFlag == 1)										//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
 	{
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(1);
@@ -393,7 +393,7 @@ void loop()
 		screenFlag = 0;
 	}
 	
-	if(seconds!=oldseconds){				//ajan päivitys kun se muuttuu.
+	if(seconds!=oldseconds){					//ajan päivitys kun se muuttuu.
 	oldseconds=seconds;
 	t = seconds;				
 	s = t % 60;
@@ -410,11 +410,11 @@ void loop()
 	TFTscreen.text(tunnit, 0, 60);
 	TFTscreen.text(MatkaT, 0, 60);
   
-	ultoa(s,secc,10);						//unsigned long = string
+	ultoa(s,secc,10);							//unsigned long = string
 	ultoa(m,mnc,10);
 	ultoa(h,hrc,10);
 	
-	strcpy(tunnit, hrc);					//aika muunnetaan yhdeksi stringiksi
+	strcpy(tunnit, hrc);						//aika muunnetaan yhdeksi stringiksi
 	strcat(tunnit, ":");
 	strcpy(minuutit, mnc);
 	strcat(minuutit, ":");
@@ -426,9 +426,9 @@ void loop()
 	TFTscreen.text(tunnit, 0, 60);
 	}
 	break;
-	case 3:									//case 3: kokonais matka mitä ajettu alustuksesta lähtien
+	case 3:										//case 3: kokonais matka mitä ajettu alustuksesta lähtien
 	
-	if(screenFlag == 1)						//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
+	if(screenFlag == 1)							//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
 	{	
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(2);
@@ -475,7 +475,7 @@ void loop()
 	}
 	break;
 	
-	case 4:									//case 4: näyttää reali aikaisen kellon
+	case 4:										//case 4: näyttää reali aikaisen kellon
 	Serial.println("CASE4");
 	delay(50);
 	break;
@@ -488,7 +488,7 @@ void loop()
 	}
 	}
 	
-	void tftSetup()							//näytön alustus funktio
+	void tftSetup()								//näytön alustus funktio
 	{
 	TFTscreen.background(0,0,0);
 	TFTscreen.stroke(1000, 200, 200);
