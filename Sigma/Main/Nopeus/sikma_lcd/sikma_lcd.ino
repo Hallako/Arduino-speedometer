@@ -79,6 +79,14 @@ void reset()						//reset funktio tripille ja ajastimelle.
 	secondsoff = millis() / 1000;
 	matkaoff = matka;
 	huippu=0;
+	TFTscreen.setTextSize(1);
+    TFTscreen.stroke(0, 0, 0);
+    TFTscreen.text(Huippu, 130, 0); 
+    huippu = 0;
+    hUippu = String (huippu);
+    hUippu.toCharArray(Huippu, 6);
+    TFTscreen.stroke(1000, 1000, 1000);
+    TFTscreen.text(Huippu, 130, 0);
 }
 
 void nollaus()						//Nolla nopeuden kun ei liikuta.
@@ -102,16 +110,12 @@ void loop()
 	matkar=matka-matkaoff;
 	del=0;
 	f = 0;
-  
+	ex=0;
   while(digitalRead(5) == HIGH)			//Mikäli painike painettu niin aloitetaan laskemaan napautuksen pituus.
 	{
     del=del+1;
 	delay(1);
     f=1;
-	ex=0;
-		if(del>3600){						//timeout.
-		break;
-		}
 	}
 	if(del<500 && f==1){				//lyhyt painallus = seuraava näyttö.
 	v+=1;
@@ -122,14 +126,13 @@ void loop()
 	}
 	
 	if(del>500 && f==1 && del<5000){	//keskipitkä painallus = nollaus.
-	reset;
+	reset();
 	}
 	
 	if(del>3500 && f==1){				//pitkä painallus = setup.
 	delay(1000);
 	del=0;
 	f=0;
-	
 		for(;ex!=1;){
 		del=0;
 		f=0;
@@ -193,7 +196,6 @@ void loop()
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.text("KM/h", 0, 100);	
-							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.text("MP/h", 0, 100);			
 							}		
@@ -201,7 +203,6 @@ void loop()
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.text("MP/h", 0, 100);	
-							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.text("KM/h", 0, 100);				
 							}
@@ -216,8 +217,6 @@ void loop()
 						TFTscreen.text(stk, 65, 100);
 						Serial.println("loop");
 						Serial.println(mph);
-						
-						TFTscreen.setTextSize(2);
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("exit", 110, 100);
 						
@@ -247,7 +246,6 @@ void loop()
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
 						TFTscreen.text("KM/h", 130, 41);
-						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("MP/h", 130, 41);
 					}
@@ -255,9 +253,22 @@ void loop()
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
 						TFTscreen.text("MP/h", 130, 41);
-						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("KM/h", 130, 41);
+					}
+					if(v==3){
+						if(mph==1){
+						TFTscreen.stroke(0, 0, 0);
+						TFTscreen.text("Km TOTAL", 70, 65);
+						TFTscreen.stroke(255, 255, 255);
+						TFTscreen.text("Miles TOTAL", 70, 65);
+						}
+						else{
+						TFTscreen.stroke(0, 0, 0);
+						TFTscreen.text("Miles TOTAL", 70, 65);	
+						TFTscreen.stroke(255, 255, 255);
+						TFTscreen.text("Km TOTAL", 70, 65);
+					}
 					}
 					}
 					skip=0;	
@@ -293,7 +304,7 @@ void loop()
 	interrupts();
 	}
   
-	if(huippu < kmh)									//huippu arvon päivitys
+	if(huippu < kmh && kmh<120)									//huippu arvon päivitys
 	{
     TFTscreen.setTextSize(1);
     TFTscreen.stroke(0, 0, 0);
@@ -303,11 +314,13 @@ void loop()
     hUippu.toCharArray(Huippu, 6);
     TFTscreen.stroke(1000, 1000, 1000);
     TFTscreen.text(Huippu, 130, 0);
+	TFTscreen.text("Huippu", 85, 0);
 	} 
 	if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ //tallennetaan arvo eepromiin 200m välein
 	EEPROM.put(100, ekierrokset);
 	matkat=ematka;
 	}
+	
 	switch (v){ 										//näyttö moodin valinta
 	case 1:												//case 1: trippi mittari
 	
@@ -315,11 +328,11 @@ void loop()
 	{
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(1);
-	TFTscreen.text("TOTAL", 70, 65);
+	TFTscreen.text("Km TOTAL", 70, 65);
+	TFTscreen.text("Miles TOTAL", 70, 65);
 	TFTscreen.setTextSize(2);
 	TFTscreen.text(MatkaT, 0, 60);	
 	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.setTextSize(2);
 	TFTscreen.text(Matka, 0, 60);
 	screenFlag = 0;
 	
@@ -351,7 +364,6 @@ void loop()
 	matkaVal = String (matkar);
     matkaVal.toCharArray(Matka, 6);
     TFTscreen.stroke(255, 255, 255);
-    TFTscreen.setTextSize(2);
     TFTscreen.text(Matka, 0, 60);
     matkaold=matkar;
 	}
@@ -377,7 +389,6 @@ void loop()
 		TFTscreen.setTextSize(2);
 		TFTscreen.text(Matka, 0, 60);
 		TFTscreen.stroke(255, 255, 255);
-		TFTscreen.setTextSize(2);
 		TFTscreen.text(tunnit, 0, 60);
 		screenFlag = 0;
 	}
@@ -423,10 +434,20 @@ void loop()
 	TFTscreen.setTextSize(2);
 	TFTscreen.text(tunnit, 0, 60);
 	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.setTextSize(2);
 	TFTscreen.text(MatkaT, 0, 60);
 	TFTscreen.setTextSize(1);
-	TFTscreen.text("TOTAL", 70, 65);
+	if(mph==1){
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("Km TOTAL", 70, 65);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text("Miles TOTAL", 70, 65);
+	}
+	else{
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("Miles TOTAL", 70, 65);	
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text("Km TOTAL", 70, 65);
+	}
 	screenFlag = 0;
 	}
 	
@@ -443,13 +464,20 @@ void loop()
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(MatkaT, 0, 60);
 	}
+	if(mph==1){
 	TFTscreen.setTextSize(1);
-	TFTscreen.text("TOTAL", 70, 65);
+	TFTscreen.text("Miles TOTAL", 70, 65);
+	}
+	
+	else{
+	TFTscreen.setTextSize(1);
+	TFTscreen.text("Km TOTAL", 70, 65);
+	}
 	break;
 	
 	case 4:									//case 4: näyttää reali aikaisen kellon
 	Serial.println("CASE4");
-	delay(1000);
+	delay(50);
 	break;
 	}
 	
@@ -466,5 +494,17 @@ void loop()
 	TFTscreen.stroke(1000, 200, 200);
 	TFTscreen.setTextSize(2);
 	TFTscreen.text("SIKMA ", 0, 0);
-	TFTscreen.line(0, 55, 160, 55);    
+	TFTscreen.line(0, 55, 160, 55);   
+	matkaVal = String (matkar);
+    matkaVal.toCharArray(Matka, 6);
+    TFTscreen.stroke(255, 255, 255);
+    TFTscreen.text(Matka, 0, 60);
+    matkaold=matkar;
+	TFTscreen.setTextSize(1);
+	huippu = kmh;
+    hUippu = String (huippu);
+    hUippu.toCharArray(Huippu, 6);
+    TFTscreen.stroke(1000, 1000, 1000);
+    TFTscreen.text(Huippu, 130, 0);
+	TFTscreen.text("Huippu", 85, 0);
 	}
