@@ -294,7 +294,7 @@ void loop()
 	TFTscreen.text(sensorPrintout, 0, 20);
 	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
 	oldVal.toCharArray(oldsensor, 6);
-	
+	sleepflag=0;
 	if(mph == 1)										//piirtää mailit mikäli valittu muuten kmh
 	{
 	TFTscreen.setTextSize(1);
