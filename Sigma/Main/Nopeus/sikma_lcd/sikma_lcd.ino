@@ -39,6 +39,8 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(3), wakeUp, RISING);
 	pinMode(2,INPUT);												//alustetaan pinnit.
 	pinMode(3,INPUT);
+	pinMode(7,OUTPUT);
+	digitalWrite(7,HIGH);
 }
 
 void trig() {												//keskeytysfunktio joka laskee matkan ja nopeuden.
@@ -70,8 +72,13 @@ void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
 	power_timer2_disable();
 	sleep_enable();
+	digitalWrite(7,LOW);
 	sleep_mode();											//menee uneen.
 	sleep_disable();										//poistuu unesta.
+	digitalWrite(7,HIGH);
+	Serial.print("bismilah");
+	delay(2500);
+	tftSetup();
 	power_timer2_enable();
 }
 void reset()												//reset funktio tripille ja ajastimelle.
