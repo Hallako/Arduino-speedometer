@@ -35,7 +35,7 @@ void setup() {
 	EEPROM.get(100, ekierrokset);
 	ematka = ekierrokset * (tk*2.54*3.1459)/100000;
 	matkat=ematka;
-	MsTimer2::set(1000, nollaus); 									//Alustetaan timer nollaukselle.
+	MsTimer2::set(3000, nollaus); 									//Alustetaan timer nollaukselle.
 	MsTimer2::start();
 	screenFlag=1;
 	attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);		//Alustetaan keskeytykset.
@@ -97,7 +97,6 @@ void reset()												//reset funktio tripille ja ajastimelle.
 	TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text(Huippu, 130, 0);
 }
-
 void nollaus()												//Nolla nopeuden kun ei liikuta.
 {
 	vert1=kmh;
@@ -118,7 +117,7 @@ void loop()
 	}
 	matkar=matka-matkaoff;
 	del=0;
-	f = 0;
+	f=0;
 	ex=0;
   while(digitalRead(5) == HIGH)			//Mikäli painike painettu niin aloitetaan laskemaan napautuksen pituus.
 	{
@@ -493,9 +492,9 @@ void loop()
 	sleepNow();
 	}
 	}
-	
 	void tftSetup()								//näytön alustus funktio
 	{
+	v=1;
 	TFTscreen.background(0,0,0);
 	TFTscreen.stroke(1000, 200, 200);
 	TFTscreen.setTextSize(2);
@@ -513,5 +512,30 @@ void loop()
 	TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text(Huippu, 130, 0);
 	TFTscreen.text("Huippu", 85, 0);
-	
+	TFTscreen.setTextSize(2);
+	TFTscreen.text(Matka, 0, 60);
+	TFTscreen.setTextSize(4);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text(sensorPrintout, 0, 20);
+	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
+	oldVal.toCharArray(oldsensor, 6);
+	if(v==1){
+	if(mph == 1)	
+	{
+	TFTscreen.setTextSize(1);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("km TRIP", 60, 65);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text("miles TRIP", 60, 65);
 	}
+	else{
+	TFTscreen.setTextSize(1);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("miles TRIP", 60, 65);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text("km TRIP", 60, 65);
+		
+		
+	}
+	}
+}
