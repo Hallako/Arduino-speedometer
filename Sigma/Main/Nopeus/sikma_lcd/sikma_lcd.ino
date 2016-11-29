@@ -11,7 +11,7 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0,sleepflag;
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
 char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
@@ -64,12 +64,10 @@ void trig() {												//keskeytysfunktio joka laskee matkan ja nopeuden.
 }
 void wakeUp()
 {
-	sleepflag=0;
+	sleepFlag=0;
 }
 void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
 {
-	sleepFlag=0;
-	delay(100);
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
 	digitalWrite(7,LOW);
 	power_timer2_disable();
@@ -138,7 +136,6 @@ void loop()
 	}
 	
 	if(del>3500 && f==1){				//pitkä painallus = setup.
-	delay(1000);
 	del=0;
 	f=0;
 		for(;ex!=1;){
@@ -293,7 +290,7 @@ void loop()
 	TFTscreen.text(sensorPrintout, 0, 20);
 	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
 	oldVal.toCharArray(oldsensor, 6);
-	sleepflag=0;
+	sleepFlag=0;
 	if(mph == 1)										//piirtää mailit mikäli valittu muuten kmh
 	{
 	TFTscreen.setTextSize(1);
@@ -488,7 +485,7 @@ void loop()
 	
 	if(sleepFlag==10)							//nukkumaan meno muuttujan tarkistus
 	{
-	sleepflag=0;
+	sleepFlag=0;
 	sleepNow();
 	}
 	}
