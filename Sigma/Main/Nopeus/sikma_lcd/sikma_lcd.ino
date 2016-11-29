@@ -138,6 +138,25 @@ void loop()
 	if(del>3500 && f==1){				//pitkä painallus = setup.
 	del=0;
 	f=0;
+		if(mph==1){
+			TFTscreen.setTextSize(2);
+			TFTscreen.stroke(0, 0, 0);
+			TFTscreen.text("KM/h", 0, 105);	
+			TFTscreen.stroke(1000, 1000, 1000);
+			TFTscreen.text("MP/h", 0, 105);	
+			}		
+			if(mph==0){
+			TFTscreen.setTextSize(2);
+			TFTscreen.stroke(0, 0, 0);
+			TFTscreen.text("MP/h", 0, 105);	
+			TFTscreen.stroke(1000, 1000, 1000);
+			TFTscreen.text("KM/h", 0, 105);	
+			}	
+			Stk = String (tk);
+			Stk.toCharArray(stk, 5);
+			TFTscreen.stroke(255, 255, 255);
+			TFTscreen.text(stk, 65, 105);				
+			TFTscreen.text("exit", 110, 105);
 		for(;ex!=1;){
 		del=0;
 		f=0;
@@ -162,6 +181,21 @@ void loop()
 							else{
 							mph=0;
 							}
+							
+							if(mph==1){
+							TFTscreen.setTextSize(2);
+							TFTscreen.stroke(0, 0, 0);
+							TFTscreen.text("KM/h", 0, 105);	
+							TFTscreen.stroke(1000, 1000, 1000);
+							TFTscreen.text("MP/h", 0, 105);	
+							}		
+							if(mph==0){
+							TFTscreen.setTextSize(2);
+							TFTscreen.stroke(0, 0, 0);
+							TFTscreen.text("MP/h", 0, 105);	
+							TFTscreen.stroke(1000, 1000, 1000);
+							TFTscreen.text("KM/h", 0, 105);	
+							}
 							break;
 						case 2:									//case 2:valitaan tuumakoko.
 							otk=tk;
@@ -169,6 +203,16 @@ void loop()
 							if(tk>30){
 							tk=20;
 							}
+						Sotk = String (otk);
+						Sotk.toCharArray(sotk, 5);
+						TFTscreen.setTextSize(2);
+						TFTscreen.stroke(0, 0, 0);
+						TFTscreen.text(sotk, 65, 105);
+						
+						Stk = String (tk);
+						Stk.toCharArray(stk, 5);
+						TFTscreen.stroke(255, 255, 255);
+						TFTscreen.text(stk, 65, 105);
 							break;
 						case 3:									//case 3: poistutaan ja tallennetaan eepromiin.
 						EEPROM.put(120, mph);
@@ -178,11 +222,17 @@ void loop()
 						TFTscreen.line(110, 120, 160, 120);
 						TFTscreen.line(65, 120, 89, 120);
 						TFTscreen.line(0, 120, 48, 120);
+						TFTscreen.line(0, 95, 160, 95);
+						TFTscreen.line(0, 96, 160, 96);
+						TFTscreen.line(53, 96, 53, 130);
+						TFTscreen.line(54, 96, 54, 130);
+						TFTscreen.line(106, 96, 106, 130);
+						TFTscreen.line(107, 96, 107, 130);
 						TFTscreen.text("KM/h", 130, 41);
-						TFTscreen.text(stk, 65, 100);
-						TFTscreen.text("MP/h", 0, 100);
-						TFTscreen.text("KM/h", 0, 100);
-						TFTscreen.text("exit", 110, 100);
+						TFTscreen.text(stk, 65, 105);
+						TFTscreen.text("MP/h", 0, 105);
+						TFTscreen.text("KM/h", 0, 105);
+						TFTscreen.text("exit", 110, 105);
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("saved", 30, 100);
 						delay(1500);
@@ -192,37 +242,49 @@ void loop()
 						ex=1;
 						skip=1;
 						screenFlag=1;
+						TFTscreen.text("exit", 110, 105);
 						break;
 						}
 						}
 						
 						if(skip==0){									//suoritetaan mikäli ei poistuta funktiosta
-							if(mph==1){
+							/*if(mph==1){
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.text("KM/h", 0, 100);	
+							TFTscreen.text("KM/h", 0, 105);	
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("MP/h", 0, 100);	
+							TFTscreen.text("MP/h", 0, 105);	
 							}		
 							if(mph==0){
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.text("MP/h", 0, 100);	
+							TFTscreen.text("MP/h", 0, 105);	
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("KM/h", 0, 100);	
-							}
+							TFTscreen.text("KM/h", 0, 105);	
+							}*/
+							/*
 						Sotk = String (otk);
 						Sotk.toCharArray(sotk, 5);
+						TFTscreen.setTextSize(2);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text(sotk, 65, 100);
+						TFTscreen.text(sotk, 65, 105);
 						
 						Stk = String (tk);
 						Stk.toCharArray(stk, 5);
 						TFTscreen.stroke(255, 255, 255);
-						TFTscreen.text(stk, 65, 100);
-						TFTscreen.stroke(1000, 1000, 1000);
-						TFTscreen.text("exit", 110, 100);
+						TFTscreen.text(stk, 65, 105);
+						*/
+						//TFTscreen.text("exit", 110, 105);
+						///***********************////////
 						
+						TFTscreen.line(0, 95, 160, 95);
+						TFTscreen.line(0, 96, 160, 96);
+						TFTscreen.line(53, 96, 53, 130);
+						TFTscreen.line(54, 96, 54, 130);
+						TFTscreen.line(106, 96, 106, 130);
+						TFTscreen.line(107, 96, 107, 130);
+						
+						///***************************///	
 							if(ca==1){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(110, 120, 160, 120);
@@ -239,9 +301,8 @@ void loop()
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(65, 120, 89, 120);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(110, 120, 160, 120);
+							TFTscreen.line(110, 120, 160, 120);							
 							}
-						delay(100);
 					}
 					
 					if(skip==1){									//suoritetaan kun poistutaan funktiosta
