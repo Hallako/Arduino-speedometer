@@ -20,7 +20,10 @@ char ;
 int muuttuja;
 
 void setup() {
+	pinMode(7,OUTPUT);
+	digitalWrite(7,HIGH);
 	TFTscreen.begin();												//Alustetaan näyttö.
+	delay(1000);
 	tftSetup();
 	Serial.begin(9600);
 	start=millis();
@@ -32,15 +35,13 @@ void setup() {
 	EEPROM.get(100, ekierrokset);
 	ematka = ekierrokset * (tk*2.54*3.1459)/100000;
 	matkat=ematka;
-	MsTimer2::set(4000, nollaus); 									//Alustetaan timer nollaukselle.
+	MsTimer2::set(1000, nollaus); 									//Alustetaan timer nollaukselle.
 	MsTimer2::start();
 	screenFlag=1;
 	attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);		//Alustetaan keskeytykset.
 	attachInterrupt(digitalPinToInterrupt(3), wakeUp, RISING);
 	pinMode(2,INPUT);												//alustetaan pinnit.
 	pinMode(3,INPUT);
-	pinMode(7,OUTPUT);
-	digitalWrite(7,HIGH);
 }
 
 void trig() {												//keskeytysfunktio joka laskee matkan ja nopeuden.
@@ -70,14 +71,15 @@ void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 
 	sleepFlag=0;
 	delay(100);
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
+	digitalWrite(7,LOW);
 	power_timer2_disable();
 	sleep_enable();
-	digitalWrite(7,LOW);
 	sleep_mode();											//menee uneen.
 	sleep_disable();										//poistuu unesta.
 	digitalWrite(7,HIGH);
 	Serial.print("bismilah");
-	delay(2500);
+	TFTscreen.begin();
+	delay(100);
 	tftSetup();
 	power_timer2_enable();
 }
@@ -222,8 +224,6 @@ void loop()
 						Stk.toCharArray(stk, 5);
 						TFTscreen.stroke(255, 255, 255);
 						TFTscreen.text(stk, 65, 100);
-						Serial.println("loop");
-						Serial.println(mph);
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("exit", 110, 100);
 						
@@ -364,7 +364,6 @@ void loop()
 	
 	if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)	//matkan päivitys mikäli muuttunut.
 	{
-	Serial.print("\t");
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(2);
 	TFTscreen.text(Matka, 0, 60);
@@ -514,4 +513,5 @@ void loop()
 	TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text(Huippu, 130, 0);
 	TFTscreen.text("Huippu", 85, 0);
+	
 	}
