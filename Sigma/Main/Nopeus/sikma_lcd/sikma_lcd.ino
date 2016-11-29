@@ -138,25 +138,26 @@ void loop()
 	if(del>3500 && f==1){				//pitkä painallus = setup.
 	del=0;
 	f=0;
+		TFTscreen.background(0,0,0);
 		if(mph==1){
-			TFTscreen.setTextSize(2);
-			TFTscreen.stroke(0, 0, 0);
-			TFTscreen.text("KM/h", 0, 105);	
-			TFTscreen.stroke(1000, 1000, 1000);
-			TFTscreen.text("MP/h", 0, 105);	
-			}		
-			if(mph==0){
-			TFTscreen.setTextSize(2);
-			TFTscreen.stroke(0, 0, 0);
-			TFTscreen.text("MP/h", 0, 105);	
-			TFTscreen.stroke(1000, 1000, 1000);
-			TFTscreen.text("KM/h", 0, 105);	
-			}	
-			Stk = String (tk);
-			Stk.toCharArray(stk, 5);
-			TFTscreen.stroke(255, 255, 255);
-			TFTscreen.text(stk, 65, 105);				
-			TFTscreen.text("exit", 110, 105);
+		TFTscreen.setTextSize(2);
+		TFTscreen.stroke(0, 0, 0);
+		TFTscreen.text("KM/h", 0, 105);	
+		TFTscreen.stroke(1000, 1000, 1000);
+		TFTscreen.text("MP/h", 0, 105);	
+		}		
+		if(mph==0){
+		TFTscreen.setTextSize(2);
+		TFTscreen.stroke(0, 0, 0);
+		TFTscreen.text("MP/h", 0, 105);	
+		TFTscreen.stroke(1000, 1000, 1000);
+		TFTscreen.text("KM/h", 0, 105);	
+		}	
+		Stk = String (tk);
+		Stk.toCharArray(stk, 5);
+		TFTscreen.stroke(255, 255, 255);
+		TFTscreen.text(stk, 65, 105);				
+		TFTscreen.text("exit", 110, 105);
 		for(;ex!=1;){
 		del=0;
 		f=0;
@@ -243,40 +244,13 @@ void loop()
 						skip=1;
 						screenFlag=1;
 						TFTscreen.text("exit", 110, 105);
+						tftSetup();
 						break;
 						}
 						}
 						
 						if(skip==0){									//suoritetaan mikäli ei poistuta funktiosta
-							/*if(mph==1){
-							TFTscreen.setTextSize(2);
-							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.text("KM/h", 0, 105);	
-							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("MP/h", 0, 105);	
-							}		
-							if(mph==0){
-							TFTscreen.setTextSize(2);
-							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.text("MP/h", 0, 105);	
-							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("KM/h", 0, 105);	
-							}*/
-							/*
-						Sotk = String (otk);
-						Sotk.toCharArray(sotk, 5);
-						TFTscreen.setTextSize(2);
-						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text(sotk, 65, 105);
-						
-						Stk = String (tk);
-						Stk.toCharArray(stk, 5);
-						TFTscreen.stroke(255, 255, 255);
-						TFTscreen.text(stk, 65, 105);
-						*/
-						//TFTscreen.text("exit", 110, 105);
-						///***********************////////
-						
+		
 						TFTscreen.line(0, 95, 160, 95);
 						TFTscreen.line(0, 96, 160, 96);
 						TFTscreen.line(53, 96, 53, 130);
@@ -284,7 +258,6 @@ void loop()
 						TFTscreen.line(106, 96, 106, 130);
 						TFTscreen.line(107, 96, 107, 130);
 						
-						///***************************///	
 							if(ca==1){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(110, 120, 160, 120);
