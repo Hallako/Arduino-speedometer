@@ -11,12 +11,11 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,temp,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
-float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
-char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},VAL[7],
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
+float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
+char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},VAL[10],
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,VAK;
-char ;
 int muuttuja,muut;
 
 void setup() {
@@ -135,16 +134,13 @@ void plus(int a){
 	int h=1;
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.text(VAL, 10, 40);
-	if(VAL[a]==57&&h==1){
+	VAL[a]+=1;
+	if(VAL[a]<45||VAL[a]>57&&h==1){
 	VAL[a]=46;
 	h=0;
 	}	
-	if(VAL[a]==46||VAL[a]<46||VAL[a]>57&&h==1){
+	if(VAL[a]==47){
 	VAL[a]=48;
-	h=0;
-	}	
-	else{
-	VAL[a]+=1;
 	}
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(VAL, 10, 40);
@@ -258,7 +254,9 @@ void loop()
 						case 4:									//asetetaan alku arvo
 						//haetaan kilometri määrä
 						VAK = String (ematka);
+						Serial.println("1");
 						VAK.toCharArray(VAL, 5);
+						Serial.println(VAL);
 						muut=1;
 						TFTscreen.background(0,0,0);
 						TFTscreen.stroke(255, 255, 255);
@@ -349,9 +347,14 @@ void loop()
 								}
 						}
 						temp= atof(VAL);
-						ekierrokset=temp/(3.1459/2.54/tk)*100000;
-						EEPROM.put(100, ekierrokset);
+						Serial.println("2");
+						Serial.println(temp);
+						
+						ekierrokset=temp*100000/(tk*2.54*3.1459);
+						Serial.println(ekierrokset);
 						ematka = ekierrokset*(tk*2.54*3.1459)/100000;
+						Serial.println(ematka);
+						EEPROM.put(100, ekierrokset);
 						matkat=ematka;
 						tftsetuptup();
 						break;
