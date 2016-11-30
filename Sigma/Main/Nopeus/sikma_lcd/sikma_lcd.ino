@@ -11,13 +11,13 @@
 
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,temp,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2;
-char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},
+char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},VAL[7],
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
-String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk;
+String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,VAK;
 char ;
-int muuttuja;
+int muuttuja,muut;
 
 void setup() {
 	pinMode(7,OUTPUT);
@@ -44,9 +44,10 @@ void setup() {
 	pinMode(3,INPUT);
 }
 
-void trig() {												//keskeytysfunktio joka laskee matkan ja nopeuden.
+void trig() {														//keskeytysfunktio joka laskee matkan ja nopeuden.
 	noInterrupts();
 	fi=1;
+	sleepFlag=0;
 	elapsed=millis()-start;
 	start=millis();
 	float revs = 60000/elapsed;
@@ -105,6 +106,58 @@ void nollaus()												//Nolla nopeuden kun ei liikuta.
 	}
 	vert2=kmh;
 } 
+
+void tftsetuptup(){
+	TFTscreen.background(0,0,0);
+	if(mph==1){
+	TFTscreen.setTextSize(2);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("KM/h", 10, 10);	
+	TFTscreen.stroke(1000, 1000, 1000);
+	TFTscreen.text("MP/h", 10, 10);	
+	}		
+	if(mph==0){
+	TFTscreen.setTextSize(2);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("MP/h", 10, 10);	
+	TFTscreen.stroke(1000, 1000, 1000);
+	TFTscreen.text("KM/h", 10, 10);	
+	}	
+	Stk = String (tk);
+	Stk.toCharArray(stk, 5);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text(stk, 110, 10);				
+	TFTscreen.text("Exit", 10, 100);
+	TFTscreen.text("Reset", 10, 60);
+	TFTscreen.text("Set", 100, 60);	
+}
+void plus(int a){
+	int h=1;
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text(VAL, 10, 40);
+	if(VAL[a]==57&&h=1){
+	VAL[a]=46;
+	h=0;
+	}	
+	if(VAL[a]==46&&h=1){
+	VAL[a]=48;
+	h=0;
+	}	
+	else{
+	VAL[a]+=1;
+	}
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text(VAL, 10, 40);
+}
+
+void clrline(){
+	
+	
+	
+	
+	
+	
+}
 void loop() 
 {
 	if(fi==1){							//Mikäli keskeytys suoritettu niin delayn jälkeen nollataan keskeytykset ja sallittaan uudelleen.
@@ -130,34 +183,13 @@ void loop()
 		v=1;
 		}
 	}
-	
 	if(del>500 && f==1 && del<5000){	//keskipitkä painallus = nollaus.
 	reset();
 	}
-	
 	if(del>3500 && f==1){				//pitkä painallus = setup.
 	del=0;
 	f=0;
-		TFTscreen.background(0,0,0);
-		if(mph==1){
-		TFTscreen.setTextSize(2);
-		TFTscreen.stroke(0, 0, 0);
-		TFTscreen.text("KM/h", 0, 105);	
-		TFTscreen.stroke(1000, 1000, 1000);
-		TFTscreen.text("MP/h", 0, 105);	
-		}		
-		if(mph==0){
-		TFTscreen.setTextSize(2);
-		TFTscreen.stroke(0, 0, 0);
-		TFTscreen.text("MP/h", 0, 105);	
-		TFTscreen.stroke(1000, 1000, 1000);
-		TFTscreen.text("KM/h", 0, 105);	
-		}	
-		Stk = String (tk);
-		Stk.toCharArray(stk, 5);
-		TFTscreen.stroke(255, 255, 255);
-		TFTscreen.text(stk, 65, 105);				
-		TFTscreen.text("exit", 110, 105);
+		tftsetuptup();
 		for(;ex!=1;){
 		del=0;
 		f=0;
@@ -169,7 +201,7 @@ void loop()
 			}
 				if(del<500 && f==1){							//lyhyt painallus seuraava kohta.
 				ca+=1;
-					if(ca==4){
+					if(ca==6){
 					ca=1;
 					}
 				}
@@ -182,20 +214,19 @@ void loop()
 							else{
 							mph=0;
 							}
-							
 							if(mph==1){
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.text("KM/h", 0, 105);	
+							TFTscreen.text("KM/h", 10, 10);	
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("MP/h", 0, 105);	
+							TFTscreen.text("MP/h", 10, 10);	
 							}		
 							if(mph==0){
 							TFTscreen.setTextSize(2);
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.text("MP/h", 0, 105);	
+							TFTscreen.text("MP/h", 10, 10);	
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.text("KM/h", 0, 105);	
+							TFTscreen.text("KM/h", 10, 10);	
 							}
 							break;
 						case 2:									//case 2:valitaan tuumakoko.
@@ -208,32 +239,101 @@ void loop()
 						Sotk.toCharArray(sotk, 5);
 						TFTscreen.setTextSize(2);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text(sotk, 65, 105);
-						
+						TFTscreen.text(sotk, 110, 10);	
 						Stk = String (tk);
 						Stk.toCharArray(stk, 5);
 						TFTscreen.stroke(255, 255, 255);
-						TFTscreen.text(stk, 65, 105);
-							break;
-						case 3:									//case 3: poistutaan ja tallennetaan eepromiin.
+						TFTscreen.text(stk, 110, 10);
+						break;
+						
+						case 3:									//nollataan matka.
+						for (int i=100 ;i<120;){
+						EEPROM.write(i, 0);
+						i++;
+						}
+						ekierrokset=0;
+						break;
+						
+						case 4:									//asetetaan alku arvo
+						//haetaan kilometri määrä
+						VAK = String (ematka);
+						VAK.toCharArray(VAL, 5);
+						muut=1;
+						TFTscreen.background(0,0,0);
+						TFTscreen.stroke(255, 255, 255);
+						TFTscreen.text(VAL, 10, 40);
+						for(int x=0;x!=1;){
+							del=0;
+							f=0;
+							while(digitalRead(5) == HIGH)						//Aloitetaan ajastus
+							{
+							del+=1;
+							f=1;
+							delay(1);
+							}
+								if(del<500 && f==1){							//lyhyt painallus seuraava kohta.
+									cas+=1;	
+									if(cas==8){
+									cas=1;
+									}
+								}
+								if(del>500 && f==1){
+									
+								switch(cas){
+									
+								case 1:
+								plus(1);
+								clrline();
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(5, 50, 15, 50);
+								break;
+								
+								case 2:
+								plus(2);
+								break;
+								
+								case 3:
+								plus(3);
+								break;
+								
+								case 4:
+								plus(4);
+								break;
+								
+								case 5:
+								plus(5);
+								break;
+								
+								case 6:
+								plus(6);
+								break;
+								
+								case 7:
+								x=1;
+								break;
+								}
+								}
+						}
+						temp= atoi(VAL);
+						ekierrokset=temp*100000/3.1459/2.54;
+						EEPROM.put(100, ekierrokset);
+						ematka = ekierrokset * (tk*2.54*3.1459)/100000;
+						matkat=ematka;
+						tftsetuptup();
+						break;
+						
+						case 5:									//case 5: poistutaan ja tallennetaan eepromiin.
 						EEPROM.put(120, mph);
 						EEPROM.put(140, tk);
 						TFTscreen.setTextSize(2);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.line(110, 120, 160, 120);
-						TFTscreen.line(65, 120, 89, 120);
-						TFTscreen.line(0, 120, 48, 120);
-						TFTscreen.line(0, 95, 160, 95);
-						TFTscreen.line(0, 96, 160, 96);
-						TFTscreen.line(53, 96, 53, 130);
-						TFTscreen.line(54, 96, 54, 130);
-						TFTscreen.line(106, 96, 106, 130);
-						TFTscreen.line(107, 96, 107, 130);
-						TFTscreen.text("KM/h", 130, 41);
 						TFTscreen.text(stk, 65, 105);
-						TFTscreen.text("MP/h", 0, 105);
-						TFTscreen.text("KM/h", 0, 105);
-						TFTscreen.text("exit", 110, 105);
+						TFTscreen.text("MP/h", 10, 10);
+						TFTscreen.text("KM/h", 10, 10);
+						TFTscreen.text("Exit", 10, 100);
+						TFTscreen.text("Reset", 10, 60);
+						TFTscreen.text("Set", 100, 60);
+						TFTscreen.line(10, 120, 60, 120);	
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("saved", 30, 100);
 						delay(1500);
@@ -243,55 +343,57 @@ void loop()
 						ex=1;
 						skip=1;
 						screenFlag=1;
-						TFTscreen.text("exit", 110, 105);
+						TFTscreen.text("exit", 50, 105);
 						tftSetup();
 						break;
 						}
 						}
-						
 						if(skip==0){									//suoritetaan mikäli ei poistuta funktiosta
-		
-						TFTscreen.line(0, 95, 160, 95);
-						TFTscreen.line(0, 96, 160, 96);
-						TFTscreen.line(53, 96, 53, 130);
-						TFTscreen.line(54, 96, 54, 130);
-						TFTscreen.line(106, 96, 106, 130);
-						TFTscreen.line(107, 96, 107, 130);
-						
 							if(ca==1){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(110, 120, 160, 120);
+							TFTscreen.line(10, 120, 60, 120);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(0, 120, 48, 120);
+							TFTscreen.line(10, 25, 60, 25);
 							}
 							if(ca==2){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(0, 120, 48, 120);
+							TFTscreen.line(10, 25, 60, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(65, 120, 89, 120);
+							TFTscreen.line(100, 25, 150, 25);
 							}
 							if(ca==3){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(65, 120, 89, 120);
+							TFTscreen.line(100, 25, 150, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(110, 120, 160, 120);							
+							TFTscreen.line(10, 80, 60, 80);	
+							}							
+							if(ca==4){
+							TFTscreen.stroke(0, 0, 0);
+							TFTscreen.line(10, 80, 60, 80);
+							TFTscreen.stroke(1000, 1000, 1000);
+							TFTscreen.line(100, 80, 150, 80);	
+							}							
+							if(ca==5){
+							TFTscreen.stroke(0, 0, 0);
+							TFTscreen.line(100, 80, 150, 80);
+							TFTscreen.stroke(1000, 1000, 1000);
+							TFTscreen.line(10, 120, 60, 120);							
 							}
 					}
-					
 					if(skip==1){									//suoritetaan kun poistutaan funktiosta
 					if(mph==1){
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("KM/h", 130, 41);
+						TFTscreen.text("KM/h", 10, 10);
 						TFTscreen.stroke(1000, 1000, 1000);
-						TFTscreen.text("MP/h", 130, 41);
+						TFTscreen.text("MP/h", 10, 10);
 					}
 					if(mph==0){	
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("MP/h", 130, 41);
+						TFTscreen.text("MP/h", 10, 10);
 						TFTscreen.stroke(1000, 1000, 1000);
-						TFTscreen.text("KM/h", 130, 41);
+						TFTscreen.text("KM/h", 10, 10);
 					}
 					if(v==3){
 						if(mph==1){
@@ -311,18 +413,21 @@ void loop()
 					skip=0;	
 			}	
 	}
+	
 	seconds = (millis() / 1000)-secondsoff;  			//secondsoff = offset resetistä.
   
 	if(sensorVal != oldVal)								//päivitetään nopeus mikäli muuttunut.
 	{							
 	noInterrupts();
 	sensorVal.toCharArray(sensorPrintout, 6);
+	oldVal = sensorVal;
+	interrupts();
 	TFTscreen.setTextSize(4);
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.text(oldsensor, 0, 20);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(sensorPrintout, 0, 20);
-	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
+	//oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
 	oldVal.toCharArray(oldsensor, 6);
 	sleepFlag=0;
 	if(mph == 1)										//piirtää mailit mikäli valittu muuten kmh
