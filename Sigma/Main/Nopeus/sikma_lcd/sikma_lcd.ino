@@ -128,18 +128,18 @@ void tftsetuptup(){
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(stk, 110, 10);				
 	TFTscreen.text("Exit", 10, 100);
-	TFTscreen.text("Reset", 10, 60);
-	TFTscreen.text("Set", 100, 60);	
+	TFTscreen.text("Reset", 10, 50);
+	TFTscreen.text("Set", 100, 50);	
 }
 void plus(int a){
 	int h=1;
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.text(VAL, 10, 40);
-	if(VAL[a]==57&&h=1){
+	if(VAL[a]==57&&h==1){
 	VAL[a]=46;
 	h=0;
 	}	
-	if(VAL[a]==46&&h=1){
+	if(VAL[a]==46||VAL[a]<46||VAL[a]>57&&h==1){
 	VAL[a]=48;
 	h=0;
 	}	
@@ -252,6 +252,7 @@ void loop()
 						i++;
 						}
 						ekierrokset=0;
+						ematka = ekierrokset*(tk*2.54*3.1459)/100000;
 						break;
 						
 						case 4:									//asetetaan alku arvo
@@ -262,7 +263,9 @@ void loop()
 						TFTscreen.background(0,0,0);
 						TFTscreen.stroke(255, 255, 255);
 						TFTscreen.text(VAL, 10, 40);
+						cas=1;
 						for(int x=0;x!=1;){
+							
 							del=0;
 							f=0;
 							while(digitalRead(5) == HIGH)						//Aloitetaan ajastus
@@ -273,7 +276,7 @@ void loop()
 							}
 								if(del<500 && f==1){							//lyhyt painallus seuraava kohta.
 									cas+=1;	
-									if(cas==8){
+									if(cas==7){
 									cas=1;
 									}
 								}
@@ -282,42 +285,73 @@ void loop()
 								switch(cas){
 									
 								case 1:
-								plus(1);
+								plus(0);
 								clrline();
-								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(5, 50, 15, 50);
+
 								break;
 								
 								case 2:
-								plus(2);
+								plus(1);
 								break;
 								
 								case 3:
-								plus(3);
+								plus(2);
 								break;
 								
 								case 4:
-								plus(4);
+								plus(3);
 								break;
 								
 								case 5:
-								plus(5);
+								plus(4);
 								break;
 								
 								case 6:
-								plus(6);
-								break;
-								
-								case 7:
 								x=1;
 								break;
 								}
 								}
+								if(cas==1){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(70, 60, 80, 60);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(10, 60, 20, 60);	
+								}
+								if(cas==2){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(10, 60, 20, 60);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(22, 60, 32, 60);	
+								}
+								if(cas==3){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(22, 60, 32, 60);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(34, 60, 44, 60);	
+								}
+								if(cas==4){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(34, 60, 44, 60);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(46, 60, 56, 60);	
+								}
+								if(cas==5){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(46, 60, 56, 60);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(58, 60, 68, 60);	
+								}
+								if(cas==6){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(58, 60, 68, 60);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(70, 60, 80, 60);	
+								}
 						}
-						temp= atoi(VAL);
-						ekierrokset=temp*100000/3.1459/2.54;
+						temp= atof(VAL);
+						ekierrokset=temp/(3.1459/2.54/tk)*100000;
 						EEPROM.put(100, ekierrokset);
-						ematka = ekierrokset * (tk*2.54*3.1459)/100000;
+						ematka = ekierrokset*(tk*2.54*3.1459)/100000;
 						matkat=ematka;
 						tftsetuptup();
 						break;
@@ -331,8 +365,8 @@ void loop()
 						TFTscreen.text("MP/h", 10, 10);
 						TFTscreen.text("KM/h", 10, 10);
 						TFTscreen.text("Exit", 10, 100);
-						TFTscreen.text("Reset", 10, 60);
-						TFTscreen.text("Set", 100, 60);
+						TFTscreen.text("Reset", 10, 50);
+						TFTscreen.text("Set", 100, 50);
 						TFTscreen.line(10, 120, 60, 120);	
 						TFTscreen.stroke(1000, 1000, 1000);
 						TFTscreen.text("saved", 30, 100);
@@ -365,17 +399,17 @@ void loop()
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(100, 25, 150, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(10, 80, 60, 80);	
+							TFTscreen.line(10, 70, 60, 70);	
 							}							
 							if(ca==4){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(10, 80, 60, 80);
+							TFTscreen.line(10, 70, 60, 70);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(100, 80, 150, 80);	
+							TFTscreen.line(100, 70, 150, 70);	
 							}							
 							if(ca==5){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(100, 80, 150, 80);
+							TFTscreen.line(100, 70, 150, 70);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.line(10, 120, 60, 120);							
 							}
