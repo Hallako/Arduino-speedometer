@@ -363,7 +363,7 @@ void loop()
 						EEPROM.put(140, tk);
 						TFTscreen.setTextSize(2);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text(stk, 65, 105);
+						TFTscreen.text(stk, 110, 10);
 						TFTscreen.text("MP/h", 10, 10);
 						TFTscreen.text("KM/h", 10, 10);
 						TFTscreen.text("Exit", 10, 105);
