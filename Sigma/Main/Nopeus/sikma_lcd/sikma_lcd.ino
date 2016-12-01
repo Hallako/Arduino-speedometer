@@ -10,10 +10,10 @@
 #define rst  8
 
 TFT TFTscreen = TFT(cs, dc, rst);
-unsigned long t,s,m,h,seconds,secondsoff,oldseconds;
-int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,otk,f,kierrokset = 0,ekierrokset,ca=1,screenFlag=0,ex=0,skip=0;
+unsigned long t,s,m,h,seconds,secondsoff,oldseconds,ekierrokset;
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,otk,f,kierrokset = 0,ca=1,screenFlag=0,ex=0,skip=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
-char oldsensor[6], Matka[6], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[6],Huippu[6]={0},VAL[10],
+char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},VAL[7],
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,VAK;
 int muuttuja,muut;
@@ -26,12 +26,12 @@ void setup() {
 	tftSetup();
 	Serial.begin(9600);
 	start=millis();
-	ekierrokset = sizeof(int);										//asetetaan muuttujille koot.
+	ekierrokset = sizeof(unsigned long);										//asetetaan muuttujille koot.
 	mph = sizeof(int);
 	tk = sizeof(int);	
 	EEPROM.get(120, mph);											//Haetaan eepromista arvot matkalle ja muuttujille.
 	EEPROM.get(140, tk);
-	EEPROM.get(100, ekierrokset);
+	EEPROM.get(160, ekierrokset);
 	ematka = ekierrokset * (tk*2.54*3.1459)/100000;
 	matkat=ematka;
 	MsTimer2::set(3000, nollaus); 									//Alustetaan timer nollaukselle.
@@ -75,7 +75,6 @@ void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 
 	sleep_mode();											//menee uneen.
 	sleep_disable();										//poistuu unesta.
 	digitalWrite(7,HIGH);
-	Serial.print("bismilah");
 	TFTscreen.begin();
 	delay(100);
 	tftSetup();
@@ -126,9 +125,9 @@ void tftsetuptup(){
 	Stk.toCharArray(stk, 5);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(stk, 110, 10);				
-	TFTscreen.text("Exit", 10, 100);
-	TFTscreen.text("Reset", 10, 50);
-	TFTscreen.text("Set", 100, 50);	
+	TFTscreen.text("Exit", 10, 105);
+	TFTscreen.text("Reset", 10, 55);
+	TFTscreen.text("Set", 100, 55);	
 }
 void plus(int a){
 	int h=1;
@@ -144,15 +143,6 @@ void plus(int a){
 	}
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(VAL, 10, 40);
-}
-
-void clrline(){
-	
-	
-	
-	
-	
-	
 }
 void loop() 
 {
@@ -225,7 +215,7 @@ void loop()
 							TFTscreen.text("KM/h", 10, 10);	
 							}
 							break;
-						case 2:									//case 2:valitaan tuumakoko.
+							case 2:									//case 2:valitaan tuumakoko.
 							otk=tk;
 							tk+=2;
 							if(tk>30){
@@ -255,12 +245,13 @@ void loop()
 						//haetaan kilometri määrä
 						VAK = String (ematka);
 						Serial.println("1");
-						VAK.toCharArray(VAL, 5);
+						VAK.toCharArray(VAL, 7);
 						Serial.println(VAL);
 						muut=1;
 						TFTscreen.background(0,0,0);
 						TFTscreen.stroke(255, 255, 255);
 						TFTscreen.text(VAL, 10, 40);
+						TFTscreen.text("Exit", 102, 40);
 						cas=1;
 						for(int x=0;x!=1;){
 							
@@ -274,7 +265,7 @@ void loop()
 							}
 								if(del<500 && f==1){							//lyhyt painallus seuraava kohta.
 									cas+=1;	
-									if(cas==7){
+									if(cas==8){
 									cas=1;
 									}
 								}
@@ -284,8 +275,6 @@ void loop()
 									
 								case 1:
 								plus(0);
-								clrline();
-
 								break;
 								
 								case 2:
@@ -305,48 +294,58 @@ void loop()
 								break;
 								
 								case 6:
+								plus(5);
+								break;
+								
+								case 7:
 								x=1;
 								break;
 								}
 								}
 								if(cas==1){
 								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.line(70, 60, 80, 60);	
+								TFTscreen.line(102, 55, 152, 55);	
 								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(10, 60, 20, 60);	
+								TFTscreen.line(10, 55, 20, 55);	
 								}
 								if(cas==2){
 								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.line(10, 60, 20, 60);	
+								TFTscreen.line(10, 55, 20, 55);	
 								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(22, 60, 32, 60);	
+								TFTscreen.line(22, 55, 32, 55);	
 								}
 								if(cas==3){
 								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.line(22, 60, 32, 60);	
+								TFTscreen.line(22, 55, 32, 55);	
 								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(34, 60, 44, 60);	
+								TFTscreen.line(34, 55, 44, 55);	
 								}
 								if(cas==4){
 								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.line(34, 60, 44, 60);	
+								TFTscreen.line(34, 55, 44, 55);	
 								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(46, 60, 56, 60);	
+								TFTscreen.line(46, 55, 56, 55);	
 								}
 								if(cas==5){
 								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.line(46, 60, 56, 60);	
+								TFTscreen.line(46, 55, 56, 55);	
 								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(58, 60, 68, 60);	
+								TFTscreen.line(58, 55, 68, 55);	
 								}
 								if(cas==6){
 								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.line(58, 60, 68, 60);	
+								TFTscreen.line(58, 55, 68, 55);	
 								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.line(70, 60, 80, 60);	
+								TFTscreen.line(70, 55, 80, 55);	
+								}
+								if(cas==7){
+								TFTscreen.stroke(0, 0, 0);
+								TFTscreen.line(70, 55, 80, 55);	
+								TFTscreen.stroke(1000, 1000, 1000);
+								TFTscreen.line(102, 55, 152, 55);	
 								}
 						}
-						temp= atof(VAL);
+						temp = atof(VAL);
 						Serial.println("2");
 						Serial.println(temp);
 						
@@ -354,7 +353,7 @@ void loop()
 						Serial.println(ekierrokset);
 						ematka = ekierrokset*(tk*2.54*3.1459)/100000;
 						Serial.println(ematka);
-						EEPROM.put(100, ekierrokset);
+						EEPROM.put(160, ekierrokset);
 						matkat=ematka;
 						tftsetuptup();
 						break;
@@ -367,15 +366,15 @@ void loop()
 						TFTscreen.text(stk, 65, 105);
 						TFTscreen.text("MP/h", 10, 10);
 						TFTscreen.text("KM/h", 10, 10);
-						TFTscreen.text("Exit", 10, 100);
-						TFTscreen.text("Reset", 10, 50);
-						TFTscreen.text("Set", 100, 50);
-						TFTscreen.line(10, 120, 60, 120);	
+						TFTscreen.text("Exit", 10, 105);
+						TFTscreen.text("Reset", 10, 55);
+						TFTscreen.text("Set", 100, 55);
+						TFTscreen.line(10, 120, 58, 120);	
 						TFTscreen.stroke(1000, 1000, 1000);
-						TFTscreen.text("saved", 30, 100);
+						TFTscreen.text("saved", 40, 50);
 						delay(1500);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("saved", 30, 100);
+						TFTscreen.text("saved", 40, 50);
 						ca=1;				
 						ex=1;
 						skip=1;
@@ -388,34 +387,35 @@ void loop()
 						if(skip==0){									//suoritetaan mikäli ei poistuta funktiosta
 							if(ca==1){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(10, 120, 60, 120);
+							TFTscreen.line(10, 120, 58, 120);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(10, 25, 60, 25);
+							TFTscreen.line(10, 25, 58, 25);
 							}
 							if(ca==2){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(10, 25, 60, 25);
+							TFTscreen.line(10, 25, 58, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(100, 25, 150, 25);
+							TFTscreen.line(110, 25, 134, 25);
 							}
 							if(ca==3){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(100, 25, 150, 25);
+							TFTscreen.line(110, 25, 134, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(10, 70, 60, 70);	
+							TFTscreen.line(10, 70, 70, 70);	
 							}							
 							if(ca==4){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(10, 70, 60, 70);
+							TFTscreen.line(10, 70, 70, 70);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(100, 70, 150, 70);	
+							TFTscreen.line(100, 70, 136, 70);	
 							}							
 							if(ca==5){
 							TFTscreen.stroke(0, 0, 0);
-							TFTscreen.line(100, 70, 150, 70);
+							TFTscreen.line(100, 70, 136, 70);
 							TFTscreen.stroke(1000, 1000, 1000);
-							TFTscreen.line(10, 120, 60, 120);							
+							TFTscreen.line(10, 120, 58, 120);							
 							}
+			
 					}
 					if(skip==1){									//suoritetaan kun poistutaan funktiosta
 					if(mph==1){
@@ -435,15 +435,15 @@ void loop()
 					if(v==3){
 						if(mph==1){
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("Km TOTAL", 70, 65);
+						TFTscreen.text("Km TOTAL", 75, 65);
 						TFTscreen.stroke(255, 255, 255);
-						TFTscreen.text("Miles TOTAL", 70, 65);
+						TFTscreen.text("Miles TOTAL", 75, 65);
 						}
 						else{
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("Miles TOTAL", 70, 65);	
+						TFTscreen.text("Miles TOTAL", 75, 65);	
 						TFTscreen.stroke(255, 255, 255);
-						TFTscreen.text("Km TOTAL", 70, 65);
+						TFTscreen.text("Km TOTAL", 75, 65);
 					}
 					}
 					}
@@ -496,7 +496,7 @@ void loop()
 	TFTscreen.text("Huippu", 85, 0);
 	} 
 	if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ //tallennetaan arvo eepromiin 200m välein
-	EEPROM.put(100, ekierrokset);
+	EEPROM.put(160, ekierrokset);
 	matkat=ematka;
 	}
 	
@@ -507,8 +507,8 @@ void loop()
 	{
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(1);
-	TFTscreen.text("Km TOTAL", 70, 65);
-	TFTscreen.text("Miles TOTAL", 70, 65);
+	TFTscreen.text("Km TOTAL", 75, 65);
+	TFTscreen.text("Miles TOTAL", 75, 65);
 	TFTscreen.setTextSize(2);
 	TFTscreen.text(MatkaT, 0, 60);	
 	TFTscreen.stroke(255, 255, 255);
@@ -540,7 +540,7 @@ void loop()
 	TFTscreen.setTextSize(2);
 	TFTscreen.text(Matka, 0, 60);
 	matkaVal = String (matkar);
-	matkaVal.toCharArray(Matka, 6);
+	matkaVal.toCharArray(Matka, 7);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(Matka, 0, 60);
 	matkaold=matkar;
@@ -616,15 +616,15 @@ void loop()
 	TFTscreen.setTextSize(1);
 	if(mph==1){
 	TFTscreen.stroke(0, 0, 0);
-	TFTscreen.text("Km TOTAL", 70, 65);
+	TFTscreen.text("Km TOTAL", 75, 65);
 	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text("Miles TOTAL", 70, 65);
+	TFTscreen.text("Miles TOTAL", 75, 65);
 	}
 	else{
 	TFTscreen.stroke(0, 0, 0);
-	TFTscreen.text("Miles TOTAL", 70, 65);	
+	TFTscreen.text("Miles TOTAL", 75, 65);	
 	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text("Km TOTAL", 70, 65);
+	TFTscreen.text("Km TOTAL", 75, 65);
 	}
 	screenFlag = 0;
 	}
@@ -638,18 +638,18 @@ void loop()
 	TFTscreen.text(MatkaT, 0, 60);
 	matkav = ematka;
 	matkaT = String (ematka);
-	matkaT.toCharArray(MatkaT, 6);
+	matkaT.toCharArray(MatkaT, 7);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(MatkaT, 0, 60);
 	}
 	if(mph==1){
 	TFTscreen.setTextSize(1);
-	TFTscreen.text("Miles TOTAL", 70, 65);
+	TFTscreen.text("Miles TOTAL", 75, 65);
 	}
 	
 	else{
 	TFTscreen.setTextSize(1);
-	TFTscreen.text("Km TOTAL", 70, 65);
+	TFTscreen.text("Km TOTAL", 75, 65);
 	}
 	break;
 	
@@ -674,7 +674,7 @@ void loop()
 	TFTscreen.text("SIKMA ", 0, 0);
 	TFTscreen.line(0, 55, 160, 55);   
 	matkaVal = String (matkar);
-	matkaVal.toCharArray(Matka, 6);
+	matkaVal.toCharArray(Matka, 7);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(Matka, 0, 60);
 	matkaold=matkar;
