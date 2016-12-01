@@ -436,16 +436,16 @@ void loop()
 					if(mph==1){
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("KM/h", 10, 10);
+						TFTscreen.text("KM/h", 130, 41);
 						TFTscreen.stroke(1000, 1000, 1000);
-						TFTscreen.text("MP/h", 10, 10);
+						TFTscreen.text("MP/h", 130, 41);
 					}
 					if(mph==0){	
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
-						TFTscreen.text("MP/h", 10, 10);
+						TFTscreen.text("MP/h", 130, 41);
 						TFTscreen.stroke(1000, 1000, 1000);
-						TFTscreen.text("KM/h", 10, 10);
+						TFTscreen.text("KM/h", 130, 41);
 					}
 					if(v==3){
 						if(mph==1){
