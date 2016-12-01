@@ -4,17 +4,21 @@
 #include <MsTimer2.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
+#include <Wire.h>
+#include "RTClib.h"
 
 #define cs   10
 #define dc   9
 #define rst  8
 
+RTC_DS1307 rtc;
+
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds,ekierrokset;
-int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,otk,f,kierrokset = 0,ca=1,screenFlag=0,ex=0,skip=0;
+int sensorPin = 5,sleepFlag, v=1,del=0,mph,fi,cas,tk,otk,f,kierrokset = 0,ca=1,screenFlag=0,ex=0,skip=0,oldS=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
 char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},VAL[7],
-sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10];
+sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10], H[4], M[4], S[4], tunniT[10], minuutiT[10], sekunniT[10],RTC[10];
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,VAK;
 int muuttuja,muut;
 
@@ -41,6 +45,17 @@ void setup() {
 	attachInterrupt(digitalPinToInterrupt(3), wakeUp, RISING);
 	pinMode(2,INPUT);												//alustetaan pinnit.
 	pinMode(3,INPUT);
+	
+ if (! rtc.begin()) {
+    Serial.println("Couldn't find RTC");
+    while (1);
+  }
+
+  if (! rtc.isrunning()) {
+    Serial.println("RTC is NOT running!");
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
+
+  }
 }
 
 void trig() {														//keskeytysfunktio joka laskee matkan ja nopeuden.
@@ -452,7 +467,8 @@ void loop()
 	}
 	
 	seconds = (millis() / 1000)-secondsoff;  			//secondsoff = offset resetistä.
-  
+	DateTime now = rtc.now();							//RTC alustus
+
 	if(sensorVal != oldVal)								//päivitetään nopeus mikäli muuttunut.
 	{							
 	noInterrupts();
@@ -510,7 +526,8 @@ void loop()
 	TFTscreen.text("Km TOTAL", 75, 65);
 	TFTscreen.text("Miles TOTAL", 75, 65);
 	TFTscreen.setTextSize(2);
-	TFTscreen.text(MatkaT, 0, 60);	
+	TFTscreen.text(MatkaT, 0, 60);
+	TFTscreen.text(RTC, 0, 60);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(Matka, 0, 60);
 	screenFlag = 0;
@@ -653,9 +670,50 @@ void loop()
 	}
 	break;
 	
-	case 4:										//case 4: näyttää reali aikaisen kellon
+	case 4:								//case 4: näyttää reali aikaisen kellon
+	if(now.second() != oldS){
+	oldS = now.second();
 	Serial.println("CASE4");
-	delay(50);
+	if(mph==1){
+	TFTscreen.setTextSize(1);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("Miles TOTAL", 75, 65);
+	}
+	
+	else{
+	TFTscreen.setTextSize(1);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("Km TOTAL", 75, 65);
+	}
+	TFTscreen.setTextSize(2);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text(Matka, 0, 60);
+	TFTscreen.text(tunnit, 0, 60);
+	TFTscreen.text(MatkaT, 0, 60);
+	TFTscreen.text(tunniT, 0, 60);
+	
+
+	
+	itoa(now.hour(), H, 10);
+	itoa(now.minute(), M, 10);
+	itoa(now.second(), S, 10);
+
+
+	
+	
+	strcpy(tunniT, H);
+	strcat(tunniT, ":");
+	strcpy(minuutiT, M);
+	strcat(minuutiT, ":");
+	strcat(tunniT, minuutiT);
+	strcpy(sekunniT, S);
+	strcat(tunniT, sekunniT);
+	strcpy(RTC, tunniT);
+	TFTscreen.setTextSize(2);
+		TFTscreen.stroke(1000, 1000, 1000);
+	TFTscreen.text(RTC, 0, 60);
+	Serial.println(RTC);
+	}
 	break;
 	}
 	
