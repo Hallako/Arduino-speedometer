@@ -47,12 +47,10 @@ void setup() {
 	pinMode(3,INPUT);
 	
  if (! rtc.begin()) {
-    Serial.println("Couldn't find RTC");
     while (1);
   }
 
   if (! rtc.isrunning()) {
-    Serial.println("RTC is NOT running!");
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));
 
   }
@@ -673,7 +671,6 @@ void loop()
 	case 4:								//case 4: näyttää reali aikaisen kellon
 	if(now.second() != oldS){
 	oldS = now.second();
-	Serial.println("CASE4");
 	if(mph==1){
 	TFTscreen.setTextSize(1);
 	TFTscreen.stroke(0, 0, 0);
@@ -692,15 +689,10 @@ void loop()
 	TFTscreen.text(MatkaT, 0, 60);
 	TFTscreen.text(tunniT, 0, 60);
 	
-
-	
 	itoa(now.hour(), H, 10);
 	itoa(now.minute(), M, 10);
 	itoa(now.second(), S, 10);
 
-
-	
-	
 	strcpy(tunniT, H);
 	strcat(tunniT, ":");
 	strcpy(minuutiT, M);
@@ -712,7 +704,6 @@ void loop()
 	TFTscreen.setTextSize(2);
 		TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text(RTC, 0, 60);
-	Serial.println(RTC);
 	}
 	break;
 	}
