@@ -26,11 +26,10 @@ void setup() {
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
 	TFTscreen.begin();												//Alustetaan näyttö.
-	delay(1000);
 	tftSetup();
 	Serial.begin(9600);
 	start=millis();
-	ekierrokset = sizeof(unsigned long);										//asetetaan muuttujille koot.
+	ekierrokset = sizeof(unsigned long);							//asetetaan muuttujille koot.
 	mph = sizeof(int);
 	tk = sizeof(int);	
 	EEPROM.get(120, mph);											//Haetaan eepromista arvot matkalle ja muuttujille.
@@ -38,7 +37,7 @@ void setup() {
 	EEPROM.get(160, ekierrokset);
 	ematka = ekierrokset * (tk*2.54*3.1459)/100000;
 	matkat=ematka;
-	MsTimer2::set(3000, nollaus); 									//Alustetaan timer nollaukselle.
+	MsTimer2::set(4000, nollaus); 									//Alustetaan timer nollaukselle.
 	MsTimer2::start();
 	screenFlag=1;
 	attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);		//Alustetaan keskeytykset.
@@ -77,10 +76,60 @@ void trig() {														//keskeytysfunktio joka laskee matkan ja nopeuden.
 	}
 	sensorVal = String(kmh);
 }
-void wakeUp()
+//painikkeen painallus nollaa uniajastimen
+void wakeUp()				
 {
 	sleepFlag=0;
 }
+//Näytön alustus funktio
+void tftSetup()			
+	{
+	v=1;
+	TFTscreen.background(0,0,0);
+	TFTscreen.stroke(1000, 200, 200);
+	TFTscreen.setTextSize(2);
+	TFTscreen.text("SIKMA ", 0, 0);
+	TFTscreen.line(0, 55, 160, 55);   
+	matkaVal = String (matkar);
+	matkaVal.toCharArray(Matka, 7);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text(Matka, 0, 60);
+	matkaold=matkar;
+	TFTscreen.setTextSize(1);
+	huippu = kmh;
+	hUippu = String (huippu);
+	hUippu.toCharArray(Huippu, 6);
+	TFTscreen.stroke(1000, 1000, 1000);
+	TFTscreen.text(Huippu, 130, 0);
+	TFTscreen.text("Huippu", 85, 0);
+	TFTscreen.setTextSize(2);
+	TFTscreen.text(Matka, 0, 60);
+	TFTscreen.setTextSize(4);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text(sensorPrintout, 0, 20);
+	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
+	oldVal.toCharArray(oldsensor, 6);
+	if(v==1){
+	if(mph == 1)	
+	{
+	TFTscreen.setTextSize(1);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("km TRIP", 60, 65);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text("miles TRIP", 60, 65);
+	}
+	else{
+	TFTscreen.setTextSize(1);
+	TFTscreen.stroke(0, 0, 0);
+	TFTscreen.text("miles TRIP", 60, 65);
+	TFTscreen.stroke(255, 255, 255);
+	TFTscreen.text("km TRIP", 60, 65);
+		
+		
+	}
+	}
+}
+
 void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
 {
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);
@@ -256,9 +305,8 @@ void loop()
 						ematka = ekierrokset*(tk*2.54*3.1459)/100000;
 						break;
 						
-						case 4:									//asetetaan alku arvo
-						//haetaan kilometri määrä
-						VAK = String (ematka);
+						case 4:												//asetetaan alku arvo
+						VAK = String (ematka);								//haetaan kilometri määrä
 						Serial.println("1");
 						VAK.toCharArray(VAL, 7);
 						Serial.println(VAL);
@@ -480,7 +528,6 @@ void loop()
 	TFTscreen.text(oldsensor, 0, 20);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(sensorPrintout, 0, 20);
-	//oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
 	oldVal.toCharArray(oldsensor, 6);
 	sleepFlag=0;
 	if(mph == 1)										//piirtää mailit mikäli valittu muuten kmh
@@ -498,7 +545,7 @@ void loop()
 	}
 	interrupts();
 	}
-  
+	
 	if(huippu < kmh && kmh<120)							//huippu arvon päivitys
 	{
 	TFTscreen.setTextSize(1);
@@ -511,6 +558,7 @@ void loop()
 	TFTscreen.text(Huippu, 130, 0);
 	TFTscreen.text("Huippu", 85, 0);
 	} 
+	
 	if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ //tallennetaan arvo eepromiin 200m välein
 	EEPROM.put(160, ekierrokset);
 	matkat=ematka;
@@ -691,15 +739,10 @@ void loop()
 	TFTscreen.text(tunnit, 0, 60);
 	TFTscreen.text(MatkaT, 0, 60);
 	TFTscreen.text(tunniT, 0, 60);
-	
 
-	
 	itoa(now.hour(), H, 10);
 	itoa(now.minute(), M, 10);
 	itoa(now.second(), S, 10);
-
-
-	
 	
 	strcpy(tunniT, H);
 	strcat(tunniT, ":");
@@ -710,7 +753,7 @@ void loop()
 	strcat(tunniT, sekunniT);
 	strcpy(RTC, tunniT);
 	TFTscreen.setTextSize(2);
-		TFTscreen.stroke(1000, 1000, 1000);
+	TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text(RTC, 0, 60);
 	Serial.println(RTC);
 	}
@@ -723,50 +766,3 @@ void loop()
 	sleepNow();
 	}
 	}
-	void tftSetup()								//näytön alustus funktio
-	{
-	v=1;
-	TFTscreen.background(0,0,0);
-	TFTscreen.stroke(1000, 200, 200);
-	TFTscreen.setTextSize(2);
-	TFTscreen.text("SIKMA ", 0, 0);
-	TFTscreen.line(0, 55, 160, 55);   
-	matkaVal = String (matkar);
-	matkaVal.toCharArray(Matka, 7);
-	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text(Matka, 0, 60);
-	matkaold=matkar;
-	TFTscreen.setTextSize(1);
-	huippu = kmh;
-	hUippu = String (huippu);
-	hUippu.toCharArray(Huippu, 6);
-	TFTscreen.stroke(1000, 1000, 1000);
-	TFTscreen.text(Huippu, 130, 0);
-	TFTscreen.text("Huippu", 85, 0);
-	TFTscreen.setTextSize(2);
-	TFTscreen.text(Matka, 0, 60);
-	TFTscreen.setTextSize(4);
-	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text(sensorPrintout, 0, 20);
-	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
-	oldVal.toCharArray(oldsensor, 6);
-	if(v==1){
-	if(mph == 1)	
-	{
-	TFTscreen.setTextSize(1);
-	TFTscreen.stroke(0, 0, 0);
-	TFTscreen.text("km TRIP", 60, 65);
-	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text("miles TRIP", 60, 65);
-	}
-	else{
-	TFTscreen.setTextSize(1);
-	TFTscreen.stroke(0, 0, 0);
-	TFTscreen.text("miles TRIP", 60, 65);
-	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text("km TRIP", 60, 65);
-		
-		
-	}
-	}
-}
