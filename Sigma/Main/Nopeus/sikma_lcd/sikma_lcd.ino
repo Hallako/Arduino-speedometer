@@ -16,7 +16,7 @@ RTC_DS1307 rtc;
 TFT TFTscreen = TFT(cs, dc, rst);
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds,ekierrokset;
 int sensorPin = 5,sleepFlag, Case=1,del=0,mph,delayflag,cas,tuumakoko,oldtuumakoko,
-buttonflag,kierrokset = 0,ca=1,screenFlag=0,exitflag=0,skip=0,oldS=0;
+buttonflag,kierrokset = 0,Casesetup=1,screenFlag=0,exitflag=0,skip=0,oldS=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
 char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},VAL[7],
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10], H[4], M[4], S[4], tunniT[10], minuutiT[10], sekunniT[10],RTC[10];
@@ -247,13 +247,13 @@ void loop()
 			delay(1);
 			}
 				if(del<500 && buttonflag==1){							//lyhyt painallus seuraava kohta.
-				ca+=1;
-					if(ca==6){
-					ca=1;
+				Casesetup+=1;
+					if(Casesetup==6){
+					Casesetup=1;
 					}
 				}
 				if(del>500 && buttonflag==1){							//pitkä painallus muuttaa arvoa tai poistuu.
-					switch(ca){
+					switch(Casesetup){
 						case 1:									//case 1: mph tai kmh valinta.
 							if(mph==0){
 							mph=1;	
@@ -434,7 +434,7 @@ void loop()
 						delay(1500);
 						TFTscreen.stroke(0, 0, 0);
 						TFTscreen.text("saved", 40, 50);
-						ca=1;				
+						Casesetup=1;				
 						exitflag=1;
 						skip=1;
 						screenFlag=1;
@@ -444,31 +444,31 @@ void loop()
 						}
 						}
 						if(skip==0){									//suoritetaan mikäli ei poistuta funktiosta
-							if(ca==1){
+							if(Casesetup==1){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(10, 120, 58, 120);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.line(10, 25, 58, 25);
 							}
-							if(ca==2){
+							if(Casesetup==2){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(10, 25, 58, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.line(110, 25, 134, 25);
 							}
-							if(ca==3){
+							if(Casesetup==3){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(110, 25, 134, 25);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.line(10, 70, 70, 70);	
 							}							
-							if(ca==4){
+							if(Casesetup==4){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(10, 70, 70, 70);
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.line(100, 70, 136, 70);	
 							}							
-							if(ca==5){
+							if(Casesetup==5){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(100, 70, 136, 70);
 							TFTscreen.stroke(1000, 1000, 1000);
