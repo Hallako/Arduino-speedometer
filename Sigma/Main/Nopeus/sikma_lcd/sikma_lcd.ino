@@ -238,6 +238,11 @@ void loop()
 	buttonflag=0;
 	exitflag=0;
 	
+	//asettaa tuumakoon vakioon mikäli laiton.
+	if(tuumakoko<20||tuumakoko>30){
+		tuumakoko=20;
+	}
+	
 	//Aloittaa ajastuksen painalluksen pituudelle.
 	while(digitalRead(5) == HIGH)					
 	{
