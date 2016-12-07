@@ -1,4 +1,4 @@
-#include <TFT.h>  // Arduino LCD library
+#include <TFT.h>  //Arduino LCD library
 #include <SPI.h>
 #include <EEPROM.h>
 #include <MsTimer2.h>
@@ -50,13 +50,14 @@ void setup() {
   }
 
   if (! rtc.isrunning()) {
-    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 				//uncomment to set time to rtc.
+    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 			//uncomment to set time to rtc.
   }
 }
 
-void trig() {														//keskeytysfunktio joka laskee matkan ja nopeuden.
+//keskeytysfunktio joka laskee matkan ja nopeuden.
+void trig() {														
 	noInterrupts();
-	ag=1;
+	delayflag=1;
 	sleepFlag=0;
 	elapsed=millis()-start;
 	start=millis();
@@ -66,7 +67,7 @@ void trig() {														//keskeytysfunktio joka laskee matkan ja nopeuden.
 	ekierrokset += 1;
 	matka = kierrokset * (tuumakoko*2.54*3.1459)/100000;
 	ematka = ekierrokset * (tuumakoko*2.54*3.1459)/100000;
-	if(mph==1)												//Muunnos maileiksi mikäli valittuna.
+	if(mph==1)										
 	{
 	kmh = kmh * 0.621371;
 	matka = matka * 0.621371;
@@ -78,7 +79,7 @@ void wakeUp()
 {
 	sleepFlag=0;
 }
-//Näytön alustus funktio
+//Näytön alustus funktio jossa näytölle tulee normaali tila.
 void tftSetup()			
 	{
 	Case=1;
@@ -104,7 +105,7 @@ void tftSetup()
 	TFTscreen.setTextSize(4);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text(sensorPrintout, 0, 20);
-	oldVal = sensorVal;									//ottaa vanhan arvon talteen näytön tyhjennystä varten
+	oldVal = sensorVal;					
 	oldVal.toCharArray(oldsensor, 6);
 	if(Case==1){
 	if(mph == 1)	
@@ -121,27 +122,28 @@ void tftSetup()
 	TFTscreen.text("miles TRIP", 60, 65);
 	TFTscreen.stroke(255, 255, 255);
 	TFTscreen.text("km TRIP", 60, 65);
-		
-		
 	}
 	}
 }
 
-void sleepNow(void)											//Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
+//Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
+void sleepNow(void)											
 {
-	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);					//asetetaan sleepmode 
-	digitalWrite(7,LOW);									//näyttö kiinni
-	power_timer2_disable();									//timer2 sammutus
+	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);		//asetetaan sleepmode 
+	digitalWrite(7,LOW);						//näyttö kiinni
+	power_timer2_disable();						//timer2 sammutus
 	sleep_enable();
-	sleep_mode();											//menee uneen.
-	sleep_disable();										//poistuu unesta.
-	digitalWrite(7,HIGH);									//näyttö päälle
-	TFTscreen.begin();										//tftn alustus
+	sleep_mode();								//menee uneen.
+	sleep_disable();							//poistuu unesta.
+	digitalWrite(7,HIGH);						//näyttö päälle
+	TFTscreen.begin();							//tftn alustus
 	delay(100);
-	tftSetup();												//piirretään alku näyttö
-	power_timer2_enable();									//timer2 päälle
+	tftSetup();									//piirretään alku näyttö
+	power_timer2_enable();						//timer2 päälle
 }
-void reset()												//reset funktio tripille ja ajastimelle.
+
+//reset funktio tripille ja ajastimelle.
+void reset()									
 {
 	secondsoff = millis() / 1000;
 	matkaoff = matka;
@@ -155,7 +157,8 @@ void reset()												//reset funktio tripille ja ajastimelle.
 	TFTscreen.stroke(1000, 1000, 1000);
 	TFTscreen.text(Huippu, 130, 0);
 }
-void nollaus()												//Nolla nopeuden kun ei liikuta.
+//Nollaa nopeuden kun ei liikuta.
+void nollaus()											
 {
 	vert1=kmh;
 	if(vert1==vert2){
@@ -165,7 +168,7 @@ void nollaus()												//Nolla nopeuden kun ei liikuta.
 	}
 	vert2=kmh;
 } 
-
+//Näytön alustus funktio jossa näytölle tulee asetustila.
 void tftsetuptup(){
 	TFTscreen.background(0,0,0);
 	if(mph==1){
@@ -217,44 +220,60 @@ void loop()
 	del=0;
 	buttonflag=0;
 	exitflag=0;
-  while(digitalRead(5) == HIGH)			//Mikäli painike painettu niin aloitetaan laskemaan napautuksen pituus.
+	
+	//Aloittaa ajastuksen painalluksen pituudelle.
+	while(digitalRead(5) == HIGH)					
 	{
 	del=del+1;
 	delay(1);
 	buttonflag=1;
 	}
-	if(del<500 && buttonflag==1){				//lyhyt painallus = seuraava näyttö.
+	
+	//lyhyt painallus = seuraava näyttö.
+	if(del<500 && buttonflag==1){				
 	Case+=1;
 	screenFlag=1;
 		if(Case>4){
 		Case=1;
 		}
 	}
-	if(del>500 && buttonflag==1 && del<5000){	//keskipitkä painallus = nollaus.
+	//keskipitkä painallus = nollaus.
+	if(del>500 && buttonflag==1 && del<5000){	
 	reset();
 	}
-	if(del>3500 && buttonflag==1){				//pitkä painallus = setup.
+	
+	//pitkä painallus = setup.
+	if(del>3500 && buttonflag==1){				
 	del=0;
 	buttonflag=0;
 		tftsetuptup();
+		
+		//aloitetaan loop jossa setup pyörii
 		for(;exitflag!=1;){
 		del=0;
 		buttonflag=0;
-			while(digitalRead(5) == HIGH)						//Aloitetaan ajastus
+		
+			//Aloitetaan ajastus
+			while(digitalRead(5) == HIGH)					
 			{
 			del+=1;
 			buttonflag=1;
 			delay(1);
 			}
-				if(del<500 && buttonflag==1){							//lyhyt painallus seuraava kohta.
+				//lyhyt painallus seuraava kohta.
+				if(del<500 && buttonflag==1){				
 				Casesetup+=1;
 					if(Casesetup==6){
 					Casesetup=1;
 					}
 				}
-				if(del>500 && buttonflag==1){							//pitkä painallus muuttaa arvoa tai poistuu.
+				
+				//pitkä painallus muuttaa arvoa tai poistuu.
+				if(del>500 && buttonflag==1){				
 					switch(Casesetup){
-						case 1:									//case 1: mph tai kmh valinta.
+						
+						//case 1: mph tai kmh valinta.
+						case 1:										
 							if(mph==0){
 							mph=1;	
 							}
@@ -276,7 +295,9 @@ void loop()
 							TFTscreen.text("KM/h", 10, 10);	
 							}
 							break;
-							case 2:									//case 2:valitaan tuumakoko.
+							
+							//case 2:valitaan tuumakoko.
+							case 2:									
 							oldtuumakoko=tuumakoko;
 							tuumakoko+=2;
 							if(tuumakoko>30){
@@ -293,7 +314,8 @@ void loop()
 						TFTscreen.text(stk, 110, 10);
 						break;
 						
-						case 3:									//nollataan matka.
+						//nollataan matka.
+						case 3:									
 						for (int i=100 ;i<120;){
 						EEPROM.write(i, 0);
 						i++;
@@ -302,8 +324,9 @@ void loop()
 						ematka = ekierrokset*(tuumakoko*2.54*3.1459)/100000;
 						break;
 						
-						case 4:												//asetetaan alku arvo
-						VAK = String (ematka);								//haetaan kilometri määrä
+						//asetetaan alku arvo
+						case 4:												
+						VAK = String (ematka);			
 						Serial.println("1");
 						VAK.toCharArray(VAL, 7);
 						Serial.println(VAL);
@@ -316,13 +339,13 @@ void loop()
 							
 							del=0;
 							buttonflag=0;
-							while(digitalRead(5) == HIGH)						//Aloitetaan ajastus
+							while(digitalRead(5) == HIGH)	
 							{
 							del+=1;
 							buttonflag=1;
 							delay(1);
 							}
-								if(del<500 && buttonflag==1){							//lyhyt painallus seuraava kohta.
+								if(del<500 && buttonflag==1){	
 									cas+=1;	
 									if(cas==8){
 									cas=1;
@@ -330,6 +353,7 @@ void loop()
 								}
 								if(del>500 && buttonflag==1){
 									
+								//casen mukaan kasvatetaan valittua numeroa.
 								switch(cas){
 									
 								case 1:
@@ -361,6 +385,8 @@ void loop()
 								break;
 								}
 								}
+								
+								//seuraavat komennot siirtää valinta osoitinta eteenpäin casen mukaan.
 								if(cas==1){
 								TFTscreen.stroke(0, 0, 0);
 								TFTscreen.line(102, 55, 152, 55);	
@@ -417,7 +443,8 @@ void loop()
 						tftsetuptup();
 						break;
 						
-						case 5:									//case 5: poistutaan ja tallennetaan eepromiin.
+						//case 5: poistutaan ja tallennetaan muuttujat eepromiin.
+						case 5:									
 						EEPROM.put(120, mph);
 						EEPROM.put(140, tuumakoko);
 						TFTscreen.setTextSize(2);
@@ -443,7 +470,8 @@ void loop()
 						break;
 						}
 						}
-						if(skip==0){									//suoritetaan mikäli ei poistuta funktiosta
+						//suoritetaan mikäli ei poistuta setupista
+						if(skip==0){
 							if(Casesetup==1){
 							TFTscreen.stroke(0, 0, 0);
 							TFTscreen.line(10, 120, 58, 120);
@@ -476,7 +504,8 @@ void loop()
 							}
 			
 					}
-					if(skip==1){									//suoritetaan kun poistutaan funktiosta
+					//suoritetaan kun poistutaan funktiosta
+					if(skip==1){								
 					if(mph==1){
 						TFTscreen.setTextSize(1);
 						TFTscreen.stroke(0, 0, 0);
@@ -509,11 +538,13 @@ void loop()
 					skip=0;	
 			}	
 	}
-	
-	seconds = (millis() / 1000)-secondsoff;  			//secondsoff = offset resetistä.
-	DateTime now = rtc.now();							//RTC alustus
+	//lasketaan trippi matka 
+	seconds = (millis() / 1000)-secondsoff;  	
+	//RTC alustus
+	DateTime now = rtc.now();							
 
-	if(sensorVal != oldVal)								//päivitetään nopeus mikäli muuttunut.
+	//päivitetään nopeus mikäli muuttunut.
+	if(sensorVal != oldVal)								
 	{							
 	noInterrupts();
 	sensorVal.toCharArray(sensorPrintout, 6);
@@ -526,7 +557,9 @@ void loop()
 	TFTscreen.text(sensorPrintout, 0, 20);
 	oldVal.toCharArray(oldsensor, 6);
 	sleepFlag=0;
-	if(mph == 1)										//piirtää mailit mikäli valittu muuten kmh
+	
+	//piirtää mailit mikäli valittu muuten kmh
+	if(mph == 1)										
 	{
 	TFTscreen.setTextSize(1);
 	TFTscreen.stroke(1000, 1000, 1000);
@@ -542,7 +575,8 @@ void loop()
 	interrupts();
 	}
 	
-	if(huippu < kmh && kmh<120)							//huippu arvon päivitys
+	//huippu arvon päivitys
+	if(huippu < kmh && kmh<120)							
 	{
 	TFTscreen.setTextSize(1);
 	TFTscreen.stroke(0, 0, 0);
@@ -555,15 +589,20 @@ void loop()
 	TFTscreen.text("Huippu", 85, 0);
 	} 
 	
-	if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ //tallennetaan arvo eepromiin 200m välein
+	//tallennetaan arvo eepromiin 200m välein
+	if(roundf((matkat+0.2) * 100) < roundf(ematka * 100)){ 
 	EEPROM.put(160, ekierrokset);
 	matkat=ematka;
 	}
 	
-	switch (Case){ 											//näyttö moodin valinta
-	case 1:													//case 1: trippi mittari
+	//näyttö moodin valinta
+	switch (Case){ 		
 	
-	if(screenFlag == 1)										//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
+	//case 1: trippi mittari	
+	case 1:													
+	
+	//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille mihin siirrytään
+	if(screenFlag == 1)										
 	{
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(1);
@@ -595,7 +634,8 @@ void loop()
 	}
 	}
 	
-	if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)	//matkan päivitys mikäli muuttunut.
+	//matkan päivitys mikäli muuttunut.
+	if(roundf(matkar * 100) / 1 != roundf(matkaold * 100) / 1)	
 	{
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(2);
@@ -608,9 +648,11 @@ void loop()
 	}
 	break;
 	
-	case 2:														//case 2: harjoituksen kesto ajastin
+	//case 2: harjoituksen kesto ajastin
+	case 2:						
 	
-	if(screenFlag == 1)											//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
+	//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
+	if(screenFlag == 1)											
 	{		
 		if(mph == 1)	
 		{	
@@ -632,7 +674,8 @@ void loop()
 		screenFlag = 0;
 	}
 	
-	if(seconds!=oldseconds){					//ajan päivitys kun se muuttuu.
+	//ajan päivitys kun se muuttuu.
+	if(seconds!=oldseconds){					
 	oldseconds=seconds;
 	t = seconds;				
 	s = t % 60;
@@ -648,12 +691,14 @@ void loop()
 	TFTscreen.text(Matka, 0, 60);
 	TFTscreen.text(tunnit, 0, 60);
 	TFTscreen.text(MatkaT, 0, 60);
-  
-	ultoa(s,secc,10);							//unsigned long = string
+	
+    //unsigned long = string
+	ultoa(s,secc,10);							
 	ultoa(m,mnc,10);
 	ultoa(h,hrc,10);
 	
-	strcpy(tunnit, hrc);						//aika muunnetaan yhdeksi stringiksi
+	//aika muunnetaan yhdeksi stringiksi
+	strcpy(tunnit, hrc);						
 	strcat(tunnit, ":");
 	strcpy(minuutit, mnc);
 	strcat(minuutit, ":");
@@ -665,9 +710,12 @@ void loop()
 	TFTscreen.text(tunnit, 0, 60);
 	}
 	break;
-	case 3:										//case 3: kokonais matka mitä ajettu alustuksesta lähtien
 	
-	if(screenFlag == 1)							//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille
+	//case 3: kokonais matka mitä ajettu alustuksesta lähtien
+	case 3:			
+	
+	//screenflag asettuu mikäli näyttö tilaa muutetaan ja se alustaa näytön moodille mihin siirrytään
+	if(screenFlag == 1)						
 	{	
 	TFTscreen.stroke(0, 0, 0);
 	TFTscreen.setTextSize(2);
@@ -714,7 +762,8 @@ void loop()
 	}
 	break;
 	
-	case 4:								//case 4: näyttää reali aikaisen kellon
+	//case 4: näyttää reali aikaisen kellon
+	case 4:								
 	if(now.second() != oldS){
 	oldS = now.second();
 	Serial.println("CASE4");
@@ -756,7 +805,8 @@ void loop()
 	break;
 	}
 	
-	if(sleepFlag==10)							//nukkumaan meno muuttujan tarkistus
+	//nukkumaan meno muuttujan tarkistus
+	if(sleepFlag==10)							
 	{
 	sleepFlag=0;
 	sleepNow();
