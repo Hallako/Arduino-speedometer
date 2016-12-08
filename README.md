@@ -9,7 +9,7 @@ toteutetaan arduinolla sikma.
 
 |   	| Arduino Pin 	|
 | ---  	| ---   	|
-| BUTTON| 5, 3 	|
+| `BUTTON`| 5, 3 	|
 
 
 ### Hall Effect Switch ICs C1024 
@@ -20,25 +20,25 @@ toteutetaan arduinolla sikma.
 
 |   	| Arduino Pin 	|
 | ---  	| ---   |
-| Vout 	|  2 	|
+| `Vout` 	|  2 	|
 
 
 
 ### Arduino Tft Screen
-*Screen GND pin switch IRF640N MOSFET.*
+  *Screen GND pin switch IRF640N MOSFET.*
 
 |   	| Arduino Pin 	|
 | ---  	| ---       |
-| SCK 		| 13   	|
-| MOSI  	| 11    |
-| CS 		| 10    |
-| DC    	| 9    	|
-| RST 		| 8    	|
+| `SCK` 		| 13   	|
+| `MOSI`  	| 11    |
+| `CS` 		  | 10    |
+| `DC`    	| 9    	|
+| `RST` 		| 8    	|
 
 ### Adafruit DS1307 RTC
 
 |   	| Arduino Pin 	|
 | ---  	| ---   |
-| SDA 	| A4   	|
-| SCL  	| A5    |
+| `SDA` 	| A4   	|
+| `SCL`  	| A5    |
 
