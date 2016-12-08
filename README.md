@@ -1,14 +1,14 @@
 # Sikma
 
-Koulu Projekti
+School Project.
 
-toteutetaan arduinolla sikma.
+Implemented Arduino Uno Sikma bike speedometer.
 
 ### Button
 *Connecting pull-down resistor arduino pin to GND.*
 
 |   	| Arduino Pin 	|
-| ---  	| ---   	|
+| ---  	| ---  	|
 | `BUTTON`| 5, 3 	|
 
 
@@ -24,8 +24,9 @@ toteutetaan arduinolla sikma.
 
 
 
-### Arduino Tft Screen
-  *Screen GND pin switch IRF640N MOSFET.*
+### Arduino [Tft Screen](https://www.arduino.cc/en/Guide/TFT)
+
+ *Screen GND pin switch IRF640N MOSFET.*
 
 |   	| Arduino Pin 	|
 | ---  	| ---       |
@@ -35,7 +36,7 @@ toteutetaan arduinolla sikma.
 | `DC`    	| 9    	|
 | `RST` 		| 8    	|
 
-### Adafruit DS1307 RTC
+### RTC module [Adafruit DS1307](https://learn.adafruit.com/ds1307-real-time-clock-breakout-board-kit/arduino-library)
 
 |   	| Arduino Pin 	|
 | ---  	| ---   |
