@@ -5,7 +5,9 @@ School Project.
 Implemented Arduino Uno Sikma bike speedometer.
 
 ### Button
-*Connecting pull-down resistor arduino pin to GND.*
+*Connecting pull-down resistor arduino pin to GND,
+
+one button output connects to both pins*
 
 |   	| Arduino Pin 	|
 | ---  	| ---  	|
