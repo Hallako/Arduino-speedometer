@@ -50,6 +50,7 @@ void setup() {
 	//pinnien alustus.
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
+	Serial.begin(9600);
 	
 	//Alustetaan näyttö.
 	TFTscreen.begin();									
@@ -82,7 +83,7 @@ void setup() {
   }
 
   if (! rtc.isrunning()) {
-    //rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 			//uncomment to set time to rtc.
+    rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 			//uncomment to set time to rtc.
   }
 }
 
@@ -160,22 +161,38 @@ void tftSetup()
 		TFTscreen.stroke(255, 255, 255);
 		TFTscreen.text("km TRIP", 60, 65);
 	}
+	Serial.println("tftSetupMake");
 	}
 }
 
+void tftPaalle(void){
+	Serial.println("Näyttö päälle");
+	pinMode(7,OUTPUT);
+	digitalWrite(7,HIGH);
+	Serial.println("Näyttö on päällä");
+}
 //Nukkumis funktio mikäli ei havaittu syöttöä 40 sek.
 void sleepNow(void)											
 {
+	Serial.println("SleepNow");
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);		//asetetaan sleepmode 
 	digitalWrite(7,LOW);						//näyttö kiinni
 	power_timer2_disable();						//timer2 sammutus
 	sleep_enable();
 	sleep_mode();								//menee uneen.
 	sleep_disable();							//poistuu unesta.
-	digitalWrite(7,HIGH);						//näyttö päälle
+	Serial.println("sleep_disable");
+	delay(10);
+	tftPaalle();
+	//digitalWrite(7,HIGH);						//näyttö päälle
+	
+	delay(20);
+	Serial.println("GoToTFTscreen.begin");
 	TFTscreen.begin();							//tftn alustus
-	delay(100);
+	Serial.println("TFTscreen.begin");
+	delay(500);
 	tftSetup();									//piirretään alku näyttö
+	Serial.println("tftSetup");
 	power_timer2_enable();						//timer2 päälle
 }
 
@@ -197,6 +214,7 @@ void reset()
 //Nollaa nopeuden kun ei liikuta.
 void nollaus()											
 {
+	Serial.println("Nollaus");
 	vert1=kmh;
 	if(vert1==vert2){
 		kmh=0;	
@@ -207,6 +225,7 @@ void nollaus()
 } 
 //Näytön alustus funktio jossa näytölle tulee asetustila.
 void tftsetuptup(){
+	Serial.println("tftSetuptUp");
 	TFTscreen.background(0,0,0);
 	if(mph==1){
 		TFTscreen.setTextSize(2);
@@ -841,8 +860,9 @@ void loop()
 	}
 	
 	//nukkumaan meno muuttujan tarkistus
-	if(sleepFlag==10)							
+	if(sleepFlag==2)							
 	{
+		Serial.println("GoToSleep");
 		sleepFlag=0;
 		sleepNow();
 	}
