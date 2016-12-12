@@ -38,8 +38,9 @@
 RTC_DS1307 rtc;
 
 TFT TFTscreen = TFT(cs, dc, rst);
+boolean mph;
 unsigned long t,s,m,h,seconds,secondsoff,oldseconds,ekierrokset;
-int sensorPin = 5,sleepFlag, Case=1,del=0,mph,delayflag,cas,tuumakoko,oldtuumakoko,
+int sensorPin = 5,sleepFlag, Case=1,del=0,delayflag,cas,tuumakoko,oldtuumakoko,
 buttonflag,kierrokset = 0,Casesetup=1,screenFlag=0,exitflag=0,skip=0,oldS=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
 char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},VAL[7],
@@ -52,21 +53,16 @@ void setup() {
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
 	
-	//Screen setup (spi.begin).
-	TFTscreen.begin();									
-	tftSetup();
-	
-	//Set Size for variables.
-	ekierrokset = sizeof(unsigned long);							
-	mph = sizeof(int);
-	tuumakoko = sizeof(int);	
-	
 	//Get saved data from eeprom.
 	EEPROM.get(120, mph);											
 	EEPROM.get(140, tuumakoko);
 	EEPROM.get(160, ekierrokset);
 	ematka = ekierrokset * (tuumakoko*2.54*3.1459)/100000;
 	matkat=ematka;
+	
+	//Screen setup (spi.begin).
+	TFTscreen.begin();									
+	tftSetup();
 	
 	//Setup timer for interrupt.
 	MsTimer2::set(4000, nollaus); 
@@ -120,6 +116,7 @@ void wakeUp()
 //Screen setup function draws first case on screen.
 void tftSetup()			
 	{
+	noInterrupts();
 	Case=1;
 	TFTscreen.background(0,0,0);
 	TFTscreen.stroke(1000, 200, 200);
@@ -142,27 +139,34 @@ void tftSetup()
 	TFTscreen.text(Matka, 0, 60);
 	TFTscreen.setTextSize(4);
 	TFTscreen.stroke(255, 255, 255);
+	sensorVal = String(kmh);
+	sensorVal.toCharArray(sensorPrintout, 6);
 	TFTscreen.text(sensorPrintout, 0, 20);
 	oldVal = sensorVal;					
 	oldVal.toCharArray(oldsensor, 6);
 	if(Case==1){
-	if(mph == 1)	
+	if(mph == true)	
 	{
 		TFTscreen.setTextSize(1);
 		TFTscreen.stroke(0, 0, 0);
 		TFTscreen.text("km TRIP", 60, 65);
+		TFTscreen.text("KM/h", 130, 41);
 		TFTscreen.stroke(255, 255, 255);
 		TFTscreen.text("miles TRIP", 60, 65);
+		TFTscreen.text("MP/h", 130, 41);
 	}
-	else{
+	if(mph == false)
+	{
 		TFTscreen.setTextSize(1);
 		TFTscreen.stroke(0, 0, 0);
 		TFTscreen.text("miles TRIP", 60, 65);
+		TFTscreen.text("MP/h", 130, 41);
 		TFTscreen.stroke(255, 255, 255);
 		TFTscreen.text("km TRIP", 60, 65);
+		TFTscreen.text("KM/h", 130, 41);
 	}
 	}
-	//delay(200);
+	interrupts();
 }
 
 //Sleep mode if now input in 35s.
