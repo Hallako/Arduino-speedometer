@@ -47,6 +47,7 @@ sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10], H[4], M[4], S[4], tunniT[
 String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,VAK;
 
 void setup() {
+	Serial.begin(9600);
 	//Setup pins.
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
@@ -161,23 +162,26 @@ void tftSetup()
 		TFTscreen.text("km TRIP", 60, 65);
 	}
 	}
+	//delay(200);
 }
 
 //Sleep mode if now input in 35s.
 void sleepNow(void)											
 {
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);		//set sleepmode.
-	pinMode(7,OUTPUT);
 	digitalWrite(7,LOW);						//Turn screen off.
 	power_timer2_disable();						//Timer2 shutdown.
 	sleep_enable();
 	sleep_mode();								//Goes to sleep here.
 	sleep_disable();							//Returns from sleep.
-	delay(10);
+	delay(50);
+	noInterrupts();
+	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);						//Screen on.
-	delay(20);
 	TFTscreen.begin();							//Screen setup.
 	tftSetup();									//Draws first case.
+	interrupts();
+	delay(200);
 	power_timer2_enable();						//timer2 enable.
 }
 
@@ -508,6 +512,7 @@ void loop()
 						screenFlag=1;
 						TFTscreen.text("exit", 50, 105);
 						tftSetup();
+						sleepFlag=0;
 						break;
 						}
 						}
@@ -845,7 +850,7 @@ void loop()
 	}
 	
 	//Checks sleep flag.
-	if(sleepFlag==2)							
+	if(sleepFlag>=2)							
 	{
 		sleepFlag=0;
 		sleepNow();
