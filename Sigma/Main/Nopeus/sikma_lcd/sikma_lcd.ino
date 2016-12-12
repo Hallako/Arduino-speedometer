@@ -25,7 +25,6 @@
 #include <TFT.h>  //Arduino LCD library
 #include <SPI.h>
 #include <EEPROM.h>
-#include <MsTimer2.h>
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <Wire.h>
@@ -65,10 +64,15 @@ void setup() {
 	tftSetup();
 	
 	//Setup timer for interrupt.
-	MsTimer2::set(4000, nollaus); 
-	MsTimer2::start();
-	screenFlag=1;
-	start=millis();
+	TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCCR1B |= _BV(WGM12);
+	TCCR1B |= (1<<CS12) | (1<<CS10);  // clk/1024
+	TIMSK1 |= (1<<OCIE1A);  //Output Compare A Match Interrupt Enable
+	OCR1A = 60000; ///16000000/1024=15625 
+	screenFlag = 1;
+	start = millis();
 	
 	//Set interrupts.
 	attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);		
@@ -205,7 +209,7 @@ void reset()
 	TFTscreen.text(Huippu, 130, 0);
 }
 //Resets speed if not moving.
-void nollaus()											
+ISR(TIMER1_COMPA_vect)										
 {
 	vert1=kmh;
 	if(vert1==vert2){
@@ -854,7 +858,7 @@ void loop()
 	}
 	
 	//Checks sleep flag.
-	if(sleepFlag>=2)							
+	if(sleepFlag>=10)							
 	{
 		sleepFlag=0;
 		sleepNow();
