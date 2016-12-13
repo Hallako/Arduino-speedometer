@@ -22,7 +22,7 @@
 *		SDA 	= pin A4
 *		SCL		= pin A5
 */
-#include <TFT.h>  //Arduino LCD library
+#include <TFT.h>  		//Arduino LCD library
 #include <SPI.h>
 #include <EEPROM.h>
 #include <avr/sleep.h>
@@ -38,16 +38,16 @@ RTC_DS1307 rtc;
 
 TFT TFTscreen = TFT(cs, dc, rst);
 boolean mph;
-unsigned long t,s,m,h,seconds,secondsoff,oldseconds,ekierrokset;
-int sensorPin = 5,sleepFlag, Case=1,del=0,delayflag,cas,tuumakoko,oldtuumakoko,
-buttonflag,kierrokset = 0,Casesetup=1,screenFlag=0,exitflag=0,skip=0,oldS=0;
+unsigned long t,s,m,h,seconds,secondsoffset,oldseconds,ekierrokset;
+int sensorPin = 5,sleepFlag, Case=1,Delay=0,delayflag,Set_case,tuumakoko,oldtuumakoko,
+buttonflag,kierrokset = 0,Casesetup=1,screenFlag=0,exitflag=0,skip=0,oldSecond=0;
 float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
-char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},VAL[7],
+char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},Temp_Matka[7],
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10], H[4], M[4], S[4], tunniT[10], minuutiT[10], sekunniT[10],RTC[10];
-String oldVal,sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,VAK;
+String oldVal, sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,Temp_matka;
 
 void setup() {
-	Serial.begin(9600);
+	
 	//Setup pins.
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
@@ -62,35 +62,36 @@ void setup() {
 	//Screen setup (spi.begin).
 	TFTscreen.begin();									
 	tftSetup();
+	screenFlag = 1;
 	
 	//Setup timer for interrupt.
 	TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
 	TCCR1A = 0;
 	TCCR1B = 0;
 	TCCR1B |= _BV(WGM12);
-	TCCR1B |= (1<<CS12) | (1<<CS10);  // clk/1024
+	TCCR1B |= (1<<CS12) | (1<<CS10);  //1024 prescale
 	TIMSK1 |= (1<<OCIE1A);  //Output Compare A Match Interrupt Enable
-	OCR1A = 60000; ///16000000/1024=15625 
-	screenFlag = 1;
+	OCR1A = 60000;
 	start = millis();
 	
 	//Set interrupts.
-	attachInterrupt(digitalPinToInterrupt(2), trig, FALLING);		
-	attachInterrupt(digitalPinToInterrupt(3), wakeUp, RISING);		
+	attachInterrupt(digitalPinToInterrupt(2), Sensor_trigger, FALLING);		
+	attachInterrupt(digitalPinToInterrupt(3), Button_trigger, RISING);		
 	
- if (! rtc.begin()) {
-    while (1);
+	//starts rtc if not running.
+	if (! rtc.begin()) {
+	while (1);
   }
 
-  if (! rtc.isrunning()) {
+ /* if (! rtc.isrunning()) {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 			//uncomment to set time to rtc.
-  }
+  }*/
 }
 
 //Interrupt from hall-sensor where distance and speed is calculated.
-void trig() {														
-	noInterrupts();
+void Sensor_trigger() {														
 	//Set a flag and disable interrupts to avoid multiple interrupts.
+	noInterrupts();
 	delayflag=1;
 	sleepFlag=0;
 	elapsed=millis()-start;
@@ -112,12 +113,12 @@ void trig() {
 }
 
 //Button press interrupt resets sleep counter.
-void wakeUp()				
+void Button_trigger()				
 {
 	sleepFlag=0;
 }
 
-//Screen setup function draws first case on screen.
+//Screen setup function draws general layout and first case on screen.
 void tftSetup()			
 	{
 	noInterrupts();
@@ -196,7 +197,7 @@ void sleepNow(void)
 //Reset function for trip, time and highspeed.
 void reset()									
 {
-	secondsoff = millis() / 1000;
+	secondsoffset = millis() / 1000;
 	matkaoff = matka;
 	huippu=0;
 	TFTscreen.setTextSize(1);
@@ -249,17 +250,17 @@ void tftsetuptup(){
 void plus(int a){
 	int h=1;
 	TFTscreen.stroke(0, 0, 0);
-	TFTscreen.text(VAL, 10, 40);
-	VAL[a]+=1;
-	if(VAL[a]<45||VAL[a]>57&&h==1){
-		VAL[a]=46;
+	TFTscreen.text(Temp_Matka, 10, 40);
+	Temp_Matka[a]+=1;
+	if(Temp_Matka[a]<45||Temp_Matka[a]>57&&h==1){
+		Temp_Matka[a]=46;
 		h=0;
 	}	
-	if(VAL[a]==47){
-		VAL[a]=48;
+	if(Temp_Matka[a]==47){
+		Temp_Matka[a]=48;
 	}
 	TFTscreen.stroke(255, 255, 255);
-	TFTscreen.text(VAL, 10, 40);
+	TFTscreen.text(Temp_Matka, 10, 40);
 }
 void loop() 
 {
@@ -274,7 +275,7 @@ void loop()
 	matkar=matka-matkaoff;
 	
 	//Resets variables for button press.
-	del=0;
+	Delay=0;
 	buttonflag=0;
 	exitflag=0;
 	
@@ -286,13 +287,13 @@ void loop()
 	//Starts timing when button pressed.
 	while(digitalRead(5) == HIGH)					
 	{
-		del=del+1;
+		Delay=Delay+1;
 		delay(1);
 		buttonflag=1;
 	}
 	
 	//Short press moves to next case(screen).
-	if(del<500 && buttonflag==1){				
+	if(Delay<500 && buttonflag==1){				
 		Case+=1;
 		screenFlag=1;
 		if(Case>4){
@@ -300,29 +301,29 @@ void loop()
 		}
 	}
 	//Medium long press reset function.
-	if(del>500 && buttonflag==1 && del<5000){	
+	if(Delay>500 && buttonflag==1 && Delay<5000){	
 		reset();
 	}
 	
 	//Long press goes to setup.
-	if(del>3500 && buttonflag==1){				
-		del=0;
+	if(Delay>3500 && buttonflag==1){				
+		Delay=0;
 		buttonflag=0;
 		tftsetuptup();
 		
 		//Starts loop where setup runs
 		for(;exitflag!=1;){
-			del=0;
+			Delay=0;
 			buttonflag=0;
 		
 			//Timer for button press.
 			while(digitalRead(5) == HIGH){
-				del+=1;
+				Delay+=1;
 				buttonflag=1;
 				delay(1);
 			}
 				//Short press moves to next spot.
-				if(del<500 && buttonflag==1){				
+				if(Delay<500 && buttonflag==1){				
 					Casesetup+=1;
 					if(Casesetup==6){
 						Casesetup=1;
@@ -330,32 +331,32 @@ void loop()
 				}
 				
 				//Long press changes variable or exits setup.
-				if(del>500 && buttonflag==1){				
+				if(Delay>500 && buttonflag==1){				
 					switch(Casesetup){
 						
 						//case 1: Select units.
 						case 1:										
-							if(mph==0){
-								mph=1;	
-							}
-							else{
-								mph=0;
-							}
-							if(mph==1){
-								TFTscreen.setTextSize(2);
-								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.text("KM/h", 10, 10);	
-								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.text("MP/h", 10, 10);	
-							}		
-							if(mph==0){
-								TFTscreen.setTextSize(2);
-								TFTscreen.stroke(0, 0, 0);
-								TFTscreen.text("MP/h", 10, 10);	
-								TFTscreen.stroke(1000, 1000, 1000);
-								TFTscreen.text("KM/h", 10, 10);	
-							}
-							break;
+						if(mph==0){
+							mph=1;	
+						}
+						else{
+							mph=0;
+						}
+						if(mph==1){
+							TFTscreen.setTextSize(2);
+							TFTscreen.stroke(0, 0, 0);
+							TFTscreen.text("KM/h", 10, 10);	
+							TFTscreen.stroke(1000, 1000, 1000);
+							TFTscreen.text("MP/h", 10, 10);	
+						}		
+						if(mph==0){
+							TFTscreen.setTextSize(2);
+							TFTscreen.stroke(0, 0, 0);
+							TFTscreen.text("MP/h", 10, 10);	
+							TFTscreen.stroke(1000, 1000, 1000);
+							TFTscreen.text("KM/h", 10, 10);	
+						}
+						break;
 							
 						//case 2: Select whell size.
 						case 2:									
@@ -387,32 +388,32 @@ void loop()
 						
 						//case 4: Set total distance.
 						case 4:												
-						VAK = String (ematka);			
-						VAK.toCharArray(VAL, 7);
+						Temp_matka = String (ematka);			
+						Temp_matka.toCharArray(Temp_Matka, 7);
 						TFTscreen.background(0,0,0);
 						TFTscreen.stroke(255, 255, 255);
-						TFTscreen.text(VAL, 10, 40);
+						TFTscreen.text(Temp_Matka, 10, 40);
 						TFTscreen.text("Exit", 102, 40);
-						cas=1;
+						Set_case=1;
 						for(int x=0;x!=1;){
-							del=0;
+							Delay=0;
 							buttonflag=0;
 							while(digitalRead(5) == HIGH)	
 							{
-								del+=1;
+								Delay+=1;
 								buttonflag=1;
 								delay(1);
 							}
-								if(del<500 && buttonflag==1){	
-									cas+=1;	
-									if(cas==8){
-										cas=1;
+								if(Delay<500 && buttonflag==1){	
+									Set_case+=1;	
+									if(Set_case==8){
+										Set_case=1;
 									}
 								}
-								if(del>500 && buttonflag==1){
+								if(Delay>500 && buttonflag==1){
 									
 								//nubmer selected by case is raised by 1.
-								switch(cas){
+								switch(Set_case){
 									
 								case 1:
 								plus(0);
@@ -445,50 +446,50 @@ void loop()
 								}
 								
 								//Move pointer according to case.
-								if(cas==1){
+								if(Set_case==1){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(102, 55, 152, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(10, 55, 20, 55);	
 								}
-								if(cas==2){
+								if(Set_case==2){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(10, 55, 20, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(22, 55, 32, 55);	
 								}
-								if(cas==3){
+								if(Set_case==3){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(22, 55, 32, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(34, 55, 44, 55);	
 								}
-								if(cas==4){
+								if(Set_case==4){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(34, 55, 44, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(46, 55, 56, 55);	
 								}
-								if(cas==5){
+								if(Set_case==5){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(46, 55, 56, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(58, 55, 68, 55);	
 								}
-								if(cas==6){
+								if(Set_case==6){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(58, 55, 68, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(70, 55, 80, 55);	
 								}
-								if(cas==7){
+								if(Set_case==7){
 									TFTscreen.stroke(0, 0, 0);
 									TFTscreen.line(70, 55, 80, 55);	
 									TFTscreen.stroke(1000, 1000, 1000);
 									TFTscreen.line(102, 55, 152, 55);	
 								}
 						}
-						temp = atof(VAL);
+						temp = atof(Temp_Matka);
 						ekierrokset=temp*100000/(tuumakoko*2.54*3.1459);
 						ematka = ekierrokset*(tuumakoko*2.54*3.1459)/100000;
 						EEPROM.put(160, ekierrokset);
@@ -596,7 +597,7 @@ void loop()
 	}
 	
 	//Counts training length in seconds.
-	seconds = (millis() / 1000)-secondsoff;  	
+	seconds = (millis() / 1000)-secondsoffset;  	
 	
 	//Gets time realtime from RTC.
 	DateTime now = rtc.now();							
@@ -615,7 +616,7 @@ void loop()
 		oldVal.toCharArray(oldsensor, 6);
 		sleepFlag=0;
 		
-			//Draws selected unit.
+		//Draws selected unit.
 		if(mph == 1)										
 			{
 			TFTscreen.setTextSize(1);
@@ -731,7 +732,8 @@ void loop()
 	}
 	
 	//Update time if changed.
-	if(seconds!=oldseconds){					
+	if(seconds!=oldseconds){	
+		//transforms seconds to hours, minutes and seconds
 		oldseconds=seconds;
 		t = seconds;				
 		s = t % 60;
@@ -816,10 +818,11 @@ void loop()
 	}
 	break;
 	
-	//case 4: Realtime clock.
+	//Case 4: Realtime clock.
 	case 4:								
-	if(now.second() != oldS){
-		oldS = now.second();
+	if(now.second() != oldSecond){
+		//Saves old seconds for comparasion.
+		oldSecond = now.second(); 
 		if(mph==1){
 			TFTscreen.setTextSize(1);
 			TFTscreen.stroke(0, 0, 0);
@@ -837,11 +840,13 @@ void loop()
 		TFTscreen.text(tunnit, 0, 60);
 		TFTscreen.text(MatkaT, 0, 60);
 		TFTscreen.text(tunniT, 0, 60);
-
+		
+		//Creates arrays from integers.
 		itoa(now.hour(), H, 10);
 		itoa(now.minute(), M, 10);
 		itoa(now.second(), S, 10);
 		
+		//transforms time to one string.
 		strcpy(tunniT, H);
 		strcat(tunniT, ":");
 		strcpy(minuutiT, M);
