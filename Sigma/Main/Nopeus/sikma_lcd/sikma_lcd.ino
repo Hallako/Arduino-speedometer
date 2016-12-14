@@ -62,6 +62,7 @@ void setup() {
 	Serial.println("Spi");
 	//Screen setup (spi.begin).
 	TFTscreen.begin();	
+		//delay(200);
 	tftSetup();
 	screenFlag = 1;
 	
@@ -178,6 +179,7 @@ void tftSetup()
 //Sleep mode if now input in 35s.
 void sleepNow(void)											
 {
+	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);			//set sleepmode.
 	digitalWrite(7,LOW);						//Turn screen off.
 	power_timer2_disable();						//Timer2 shutdown.
 	sleep_enable();
@@ -868,6 +870,7 @@ void loop()
 	}
 	
 	//Checks sleep flag.
+	if(sleepFlag>=3)							
 	{
 		sleepFlag=0;
 		sleepNow();
