@@ -47,20 +47,21 @@ sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10], H[4], M[4], S[4], tunniT[
 String oldVal, sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,Temp_matka;
 
 void setup() {
-	
+	Serial.begin(9600);
+	Serial.println("SetPin");
 	//Setup pins.
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
-	
+	Serial.println("EEPROM");
 	//Get saved data from eeprom.
 	EEPROM.get(120, mph);											
 	EEPROM.get(140, tuumakoko);
 	EEPROM.get(160, ekierrokset);
 	ematka = ekierrokset * (tuumakoko*2.54*3.1459)/100000;
 	matkat=ematka;
-	
+	Serial.println("Spi");
 	//Screen setup (spi.begin).
-	TFTscreen.begin();									
+	TFTscreen.begin();	
 	tftSetup();
 	screenFlag = 1;
 	
@@ -83,9 +84,9 @@ void setup() {
 	while (1);
   }
 
- /* if (! rtc.isrunning()) {
+  if (! rtc.isrunning()) {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 			//uncomment to set time to rtc.
-  }*/
+  }
 }
 
 //Interrupt from hall-sensor where distance and speed is calculated.
@@ -177,19 +178,23 @@ void tftSetup()
 //Sleep mode if now input in 35s.
 void sleepNow(void)											
 {
-	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);		//set sleepmode.
 	digitalWrite(7,LOW);						//Turn screen off.
 	power_timer2_disable();						//Timer2 shutdown.
 	sleep_enable();
 	sleep_mode();								//Goes to sleep here.
 	sleep_disable();							//Returns from sleep.
 	delay(50);
-	noInterrupts();
-	pinMode(7,OUTPUT);
-	digitalWrite(7,HIGH);						//Screen on.
-	TFTscreen.begin();							//Screen setup.
-	tftSetup();									//Draws first case.
-	interrupts();
+	//noInterrupts();
+	//pinMode(7,OUTPUT);
+	//digitalWrite(7,HIGH);						//Screen on.
+	//interrupts();
+	//TFTscreen.begin();							//Screen setup.
+
+	//tftSetup();									//Draws first case.
+	Serial.println("GoToSetup");
+	setup();
+	Serial.println("Setup");
+	
 	delay(200);
 	power_timer2_enable();						//timer2 enable.
 }
@@ -863,7 +868,6 @@ void loop()
 	}
 	
 	//Checks sleep flag.
-	if(sleepFlag>=10)							
 	{
 		sleepFlag=0;
 		sleepNow();
