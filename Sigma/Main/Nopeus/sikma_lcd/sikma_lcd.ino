@@ -41,7 +41,7 @@ boolean mph;
 unsigned long t,s,m,h,seconds,secondsoffset,oldseconds,ekierrokset;
 int sensorPin = 5,sleepFlag, Case=1,Delay=0,delayflag,Set_case,tuumakoko,oldtuumakoko,
 buttonflag,kierrokset = 0,Casesetup=1,screenFlag=0,exitflag=0,skip=0,oldSecond=0;
-float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,vert1,vert2,temp;
+float start, matka = 0, revs, elapsed,ematka, time,matkat,matkar,matkaoff,matkaold,kmh,huippu=0,matkav,MatkaMil,vert1,vert2,temp;
 char oldsensor[6], Matka[7], sensorPrintout[6], secc[4], mnc[4], hrc[4],MatkaT[7],Huippu[6]={0},Temp_Matka[7],
 sotk[5],stk[5],minuutit[10], sekunnit[10], tunnit[10], H[4], M[4], S[4], tunniT[10], minuutiT[10], sekunniT[10],RTC[10];
 String oldVal, sensorVal,matkaVal,sec,minn,hou,matkaT,hUippu,Sotk,Stk,Temp_matka;
@@ -361,6 +361,7 @@ void loop()
 							TFTscreen.stroke(1000, 1000, 1000);
 							TFTscreen.text("KM/h", 10, 10);	
 						}
+						matkav=0;
 						break;
 							
 						//case 2: Select whell size.
@@ -807,7 +808,9 @@ void loop()
 		TFTscreen.text(tunnit, 0, 60);
 		TFTscreen.text(MatkaT, 0, 60);
 		matkav = ematka;
-		matkaT = String (ematka);
+		if(mph==1){MatkaMil= ematka*0.621371;}
+		else{MatkaMil = ematka;}
+		matkaT = String (MatkaMil);
 		matkaT.toCharArray(MatkaT, 7);
 		TFTscreen.stroke(255, 255, 255);
 		TFTscreen.text(MatkaT, 0, 60);
