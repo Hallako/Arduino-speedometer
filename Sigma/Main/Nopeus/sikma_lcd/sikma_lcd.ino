@@ -67,7 +67,7 @@ void setup() {
 	screenFlag = 1;
 	
 	//Setup timer for interrupt.
-	TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
+	//TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
 	TCCR1A = 0;
 	TCCR1B = 0;
 	TCCR1B |= _BV(WGM12);
@@ -181,7 +181,7 @@ void sleepNow(void)
 {
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);			//set sleepmode.
 	digitalWrite(7,LOW);						//Turn screen off.
-	power_timer2_disable();						//Timer2 shutdown.
+	power_timer1_disable();						//Timer2 shutdown.
 	sleep_enable();
 	sleep_mode();								//Goes to sleep here.
 	sleep_disable();							//Returns from sleep.
@@ -196,9 +196,7 @@ void sleepNow(void)
 	Serial.println("GoToSetup");
 	setup();
 	Serial.println("Setup");
-	
-	delay(200);
-	power_timer2_enable();						//timer2 enable.
+	power_timer1_enable();						//timer2 enable.
 }
 
 //Reset function for trip, time and highspeed.
