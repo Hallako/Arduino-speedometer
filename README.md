@@ -1,8 +1,11 @@
-# Sikma
+# Arduino Uno Sikma bike speedometer
 
-School Project.
+We built bike speedometer as school project in group of two.
 
-Implemented Arduino Uno Sikma bike speedometer.
+Device has four screens which are trip distance, training length, total distance and realtime clock.
+
+Theres also settings menu where units and wheel size can be set and total distance reset or set.
+
 
 ### Button
 *Connecting pull-down resistor arduino pin to GND, one button output connects to both pins*
