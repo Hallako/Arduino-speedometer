@@ -50,8 +50,10 @@ void setup() {
 	Serial.begin(9600);
 	Serial.println("SetPin");
 	//Setup pins.
+	noInterrupts();
 	pinMode(7,OUTPUT);
 	digitalWrite(7,HIGH);
+	interrupts();
 	Serial.println("EEPROM");
 	//Get saved data from eeprom.
 	EEPROM.get(120, mph);											
@@ -62,12 +64,12 @@ void setup() {
 	Serial.println("Spi");
 	//Screen setup (spi.begin).
 	TFTscreen.begin();	
-		//delay(200);
+	//delay(200);
 	tftSetup();
 	screenFlag = 1;
 	
 	//Setup timer for interrupt.
-	//TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
+	TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
 	TCCR1A = 0;
 	TCCR1B = 0;
 	TCCR1B |= _BV(WGM12);
@@ -179,6 +181,7 @@ void tftSetup()
 //Sleep mode if now input in 35s.
 void sleepNow(void)											
 {
+	Serial.println("sleep");
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);			//set sleepmode.
 	digitalWrite(7,LOW);						//Turn screen off.
 	power_timer1_disable();						//Timer2 shutdown.
