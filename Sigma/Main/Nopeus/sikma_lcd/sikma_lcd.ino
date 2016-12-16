@@ -56,6 +56,7 @@ void setup() {
 	interrupts();
 	Serial.println("EEPROM");
 	//Get saved data from eeprom.
+	
 	EEPROM.get(120, mph);											
 	EEPROM.get(140, tuumakoko);
 	EEPROM.get(160, ekierrokset);
@@ -67,6 +68,10 @@ void setup() {
 	//delay(200);
 	tftSetup();
 	screenFlag = 1;
+<<<<<<< HEAD
+	timer1Setup();
+	//start = millis();
+=======
 	
 	//Setup timer for interrupt.
 	TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
@@ -77,6 +82,7 @@ void setup() {
 	TIMSK1 |= (1<<OCIE1A);  //Output Compare A Match Interrupt Enable
 	OCR1A = 60000;
 	start = millis();
+>>>>>>> origin/master
 	
 	//Set interrupts.
 	attachInterrupt(digitalPinToInterrupt(2), Sensor_trigger, FALLING);		
@@ -91,6 +97,19 @@ void setup() {
     rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); 			//uncomment to set time to rtc.
   }
 }
+
+void timer1Setup() {											//Setup timer for interrupt.
+	
+	//TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
+	TCCR1A = 0;
+	TCCR1B = 0;
+	TCCR1B |= _BV(WGM12);
+	TCCR1B |= (1<<CS12) | (1<<CS10);  //1024 prescale
+	TIMSK1 |= (1<<OCIE1A);  //Output Compare A Match Interrupt Enable
+	OCR1A = 60000;
+	start = millis();
+}
+
 
 //Interrupt from hall-sensor where distance and speed is calculated.
 void Sensor_trigger() {														
@@ -178,28 +197,30 @@ void tftSetup()
 	interrupts();
 }
 
-//Sleep mode if now input in 35s.
+//Sleep mode if now input in xx s.
 void sleepNow(void)											
 {
 	Serial.println("sleep");
 	set_sleep_mode(SLEEP_MODE_EXT_STANDBY);			//set sleepmode.
 	digitalWrite(7,LOW);						//Turn screen off.
-	power_timer1_disable();						//Timer2 shutdown.
+	Serial.println("GoToSleep");
+	//power_timer1_disable();					//Timer2 shutdown.
 	sleep_enable();
 	sleep_mode();								//Goes to sleep here.
 	sleep_disable();							//Returns from sleep.
+	power_all_enable();
+	Serial.begin(9600);
+	delay(500);
+	Serial.println("GoToDigitalWrite");	
+	digitalWrite(7,HIGH);						//Screen on.
+	Serial.println("DigitalWrite");
+	delay(1500);
+	TFTscreen.begin();							//Screen setup.
+	//delay(2500);
+	tftSetup();									//Draws first case.
+	power_timer1_enable();
 	delay(50);
-	//noInterrupts();
-	//pinMode(7,OUTPUT);
-	//digitalWrite(7,HIGH);						//Screen on.
-	//interrupts();
-	//TFTscreen.begin();							//Screen setup.
-
-	//tftSetup();									//Draws first case.
-	Serial.println("GoToSetup");
-	setup();
-	Serial.println("Setup");
-	power_timer1_enable();						//timer2 enable.
+	timer1Setup();
 }
 
 //Reset function for trip, time and highspeed.
@@ -309,7 +330,7 @@ void loop()
 		}
 	}
 	//Medium long press reset function.
-	if(Delay>500 && buttonflag==1 && Delay<5000){	
+	if(Delay>500 && buttonflag==1 && Delay<3499){	
 		reset();
 	}
 	
