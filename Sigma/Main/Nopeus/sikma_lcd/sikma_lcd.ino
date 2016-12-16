@@ -68,21 +68,8 @@ void setup() {
 	//delay(200);
 	tftSetup();
 	screenFlag = 1;
-<<<<<<< HEAD
+
 	timer1Setup();
-	//start = millis();
-=======
-	
-	//Setup timer for interrupt.
-	TCCR1A |= _BV(COM1A0); //Toggle OC1A on compare match
-	TCCR1A = 0;
-	TCCR1B = 0;
-	TCCR1B |= _BV(WGM12);
-	TCCR1B |= (1<<CS12) | (1<<CS10);  //1024 prescale
-	TIMSK1 |= (1<<OCIE1A);  //Output Compare A Match Interrupt Enable
-	OCR1A = 60000;
-	start = millis();
->>>>>>> origin/master
 	
 	//Set interrupts.
 	attachInterrupt(digitalPinToInterrupt(2), Sensor_trigger, FALLING);		
