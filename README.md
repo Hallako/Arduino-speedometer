@@ -7,6 +7,7 @@ Device has four screens which are trip distance, training length, total distance
 Theres also settings menu where units and wheel size can be set and total distance reset or set.
 
 Youtube showcase videos:
+
 https://www.youtube.com/watch?v=SHsmYizxoB8
 
 https://www.youtube.com/watch?v=4nt99oDK5W8
